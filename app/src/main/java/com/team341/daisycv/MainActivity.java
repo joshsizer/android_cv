@@ -14,18 +14,7 @@ public class MainActivity extends Activity {
 
   public static int MY_PERMISSIONS_REQUEST_CAMERA = 1;
 
-  // Used to load the 'native-lib' library on application startup.
-  static {
-    System.loadLibrary("native-lib");
-  }
-
-  /**
-   * A native method that is implemented by the 'native-lib' native library,
-   * which is packaged with this application.
-   */
-  public static native String stringFromJNI();
-
-  public static native int matrixSize();
+  private CameraView mCameraView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +56,19 @@ public class MainActivity extends Activity {
     }
 
     setContentView(R.layout.activity_main);
-    CameraView view = (CameraView) findViewById(R.id.camera_view);
-    view.setCameraTextureListener(view);
+    mCameraView = (CameraView) findViewById(R.id.camera_view);
+    mCameraView.setCameraTextureListener(mCameraView);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mCameraView.onPause();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mCameraView.onResume();
   }
 }
