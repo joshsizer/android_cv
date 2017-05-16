@@ -58,7 +58,7 @@ public class CameraView extends CameraGLSurfaceView implements
       mFrameCounter = 0;
       mLastNanoTime = System.nanoTime();
     }
-    ImageProcessor.proccessImage(texIn, texOut, width, height);
-    return false;
+    ImageProcessor.processImage(texIn, texOut, width, height);
+    return true;
   }
 }

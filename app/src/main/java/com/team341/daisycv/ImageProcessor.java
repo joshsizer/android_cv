@@ -10,12 +10,5 @@ public class ImageProcessor {
     System.loadLibrary("native-lib");
   }
 
-
-  /**
-   * A native method that is implemented by the 'native-lib' native library,
-   * which is packaged with this application.
-   */
-  public static native String stringFromJNI();
-
-  public static native void proccessImage(int texIn, int texOut, int width, int height);
+  public static native void processImage(int texIn, int texOut, int width, int height);
 }

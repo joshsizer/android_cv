@@ -3,22 +3,9 @@
 #include <opencv2/opencv.hpp>
 #include <android/log.h>
 #include <GLES2/gl2.h>
-#include "include/common.hpp"
+#include "common.hpp"
 
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_team341_daisycv_ImageProcessor_stringFromJNI(
-    JNIEnv *env,
-    jobject /* this */) {
-  std::string hello = "Hello from C++";
-
-  return env->NewStringUTF(hello.c_str());
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_com_team341_daisycv_ImageProcessor_proccessImage(
-    JNIEnv *env,
-    jobject, int texIn, int texOut, int width, int height) {
-
+extern "C" void process(int texIn, int texOut, int width, int height) {
   int64_t startTime;
 
   static cv::Mat input;
@@ -31,7 +18,18 @@ extern "C" JNIEXPORT jint JNICALL Java_com_team341_daisycv_ImageProcessor_procce
 
   LOGD("glReadPixels took %d milliseconds", getTimeInterval(startTime));
 
-  jint size = input.size().area();
+  cv::Mat vis = input;
+  cv::circle(vis, cv::Point(width/2, height/2), 100,
+             cv::Scalar(0, 112, 255), 3);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texOut);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
+                  vis.data);
+}
 
-  return size;
+extern "C" JNIEXPORT void JNICALL Java_com_team341_daisycv_ImageProcessor_processImage(
+    JNIEnv *env,
+    jobject, jint texIn, jint texOut, jint width, jint height) {
+
+  process(texIn, texOut, width, height);
 }
