@@ -15,10 +15,13 @@ public class MainActivity extends Activity {
   public static int MY_PERMISSIONS_REQUEST_CAMERA = 1;
 
   private CameraView mCameraView;
+  private Client client;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    client = new Client("localhost", 8341);
+    client.start();
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

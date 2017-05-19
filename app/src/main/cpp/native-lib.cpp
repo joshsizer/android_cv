@@ -6,17 +6,19 @@
 #include "common.hpp"
 
 extern "C" void process(int texIn, int texOut, int width, int height) {
+  bool debug_mode = false;
   int64_t startTime;
 
   static cv::Mat input;
   input.create(height, width, CV_8UC4);
-  LOGD("Got image of size %d x %d", input.cols, input.rows);
+
+  if (debug_mode) LOGD("Got image of size %d x %d", input.cols, input.rows);
 
   startTime = getTimeMs();
   // read
   glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, input.data);
 
-  LOGD("glReadPixels took %d milliseconds", getTimeInterval(startTime));
+  if (debug_mode) LOGD("glReadPixels took %d milliseconds", getTimeInterval(startTime));
 
   cv::Mat vis = input;
   cv::circle(vis, cv::Point(width/2, height/2), 100,
