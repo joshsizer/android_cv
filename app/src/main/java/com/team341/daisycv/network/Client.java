@@ -1,7 +1,9 @@
-package com.team341.daisycv;
+package com.team341.daisycv.network;
 
 import android.util.Log;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**
@@ -24,7 +26,10 @@ public class Client {
   private boolean mEnabled;
   private final String mHostName;
   private final int mPort;
-  private Thread mConnectionThread;
+  private Thread mConnectionThread, mWriteThread, mReadThread;
+
+  private static final int kHeartBeatPeriod = 100; //ms
+  private static final int kMaxAcceptableHeartBeatPeriod = 300; //ms
 
   public Client(String hostName, int port) {
     mHostName = hostName;
@@ -35,7 +40,27 @@ public class Client {
   public synchronized void start() {
     mEnabled = true;
     mConnectionThread = new Thread(new ConnectionThread());
+
     mConnectionThread.start();
+  }
+
+  public synchronized void stop() {
+    mEnabled = false;
+    mConnected = false;
+    try {
+      mConnectionThread.join();
+      //mWriteThread.join();
+      //mReadThread.join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    try {
+      mSocket.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    mSocket = null;
   }
 
   protected class ConnectionThread implements Runnable {
@@ -49,12 +74,28 @@ public class Client {
             Thread.sleep(100);
           } else {
             Log.i("Client", "STATUS: CONNECTED");
-            Thread.sleep(5000);
+            Thread.sleep(1000);
           }
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
       }
+    }
+  }
+
+  protected class WriteThread implements Runnable {
+
+    @Override
+    public void run() {
+
+    }
+  }
+
+  protected class ReadThread implements Runnable {
+
+    @Override
+    public void run() {
+
     }
   }
 
@@ -71,7 +112,6 @@ public class Client {
       }
     } catch (IOException e) {
       e.printStackTrace();
-      mConnected = false;
     }
   }
 }

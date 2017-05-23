@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.Window;
 import android.view.WindowManager;
+import com.team341.daisycv.network.Client;
 
 public class MainActivity extends Activity {
 
@@ -67,11 +68,13 @@ public class MainActivity extends Activity {
   protected void onPause() {
     super.onPause();
     mCameraView.onPause();
+    client.stop();
   }
 
   @Override
   protected void onResume() {
     super.onResume();
     mCameraView.onResume();
+    client.start();
   }
 }

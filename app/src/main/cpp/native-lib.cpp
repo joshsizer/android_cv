@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
 #include <android/log.h>
 #include <GLES2/gl2.h>
 #include "common.hpp"
@@ -20,7 +21,12 @@ extern "C" void process(int texIn, int texOut, int width, int height) {
 
   if (debug_mode) LOGD("glReadPixels took %d milliseconds", getTimeInterval(startTime));
 
-  cv::Mat vis = input;
+  cv::Mat thresh;
+  cv::cvtColor(input, thresh, cv::COLOR_RGBA2BGR);
+  cv::cvtColor(thresh, thresh, cv::COLOR_BGR2HSV);
+  cv::inRange(thresh, cv::Scalar(45, 0, 0), cv::Scalar(75,255,255), thresh);
+  cv::Mat vis = thresh;
+  cv::cvtColor(vis, vis, cv::COLOR_GRAY2RGBA);
   cv::circle(vis, cv::Point(width/2, height/2), 100,
              cv::Scalar(0, 112, 255), 3);
   glActiveTexture(GL_TEXTURE0);
