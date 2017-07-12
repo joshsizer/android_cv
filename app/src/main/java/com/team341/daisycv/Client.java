@@ -1,4 +1,4 @@
-package com.team341.daisycv.network;
+package com.team341.daisycv;
 
 import android.util.Log;
 import java.io.BufferedReader;
@@ -31,6 +31,10 @@ public class Client {
   private static final int kHeartBeatPeriod = 100; //ms
   private static final int kMaxAcceptableHeartBeatPeriod = 300; //ms
 
+  private static final int kConnectionThreadSleep = 100; //ms
+  private static final int kWriteThreadSleep = 10;
+  private static final int kReadThreadSleep = 100;
+
   public Client(String hostName, int port) {
     mHostName = hostName;
     mPort = port;
@@ -56,7 +60,9 @@ public class Client {
     }
 
     try {
-      mSocket.close();
+      if (mSocket != null) {
+        mSocket.close();
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -71,11 +77,10 @@ public class Client {
         try {
           if (mSocket == null || (!mConnected && !mSocket.isConnected())) {
             tryConnecting();
-            Thread.sleep(100);
           } else {
             Log.i("Client", "STATUS: CONNECTED");
-            Thread.sleep(1000);
           }
+          Thread.sleep(kConnectionThreadSleep);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
@@ -111,7 +116,7 @@ public class Client {
             "Connected to " + mSocket.getInetAddress() + " on port " + mSocket.getPort());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      Log.e(LOGTAG, "Cannot connect to server!");
     }
   }
 }

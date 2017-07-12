@@ -9,7 +9,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
+import com.team341.daisycv.ImageProcessor.PROCESSING_MODE;
 import java.util.HashMap;
 import org.opencv.android.BetterCamera2Renderer;
 import org.opencv.android.BetterCameraGLSurfaceView;
@@ -27,13 +30,14 @@ public class CameraView extends BetterCameraGLSurfaceView implements
 
   public static String LOGTAG = "CameraView";
 
+  private TextView mFpsText;
   private int mFrameCounter;
   private long mLastNanoTime;
 
   static final int kHeight = 480;
   static final int kWidth = 640;
 
-  private TextView mFpsText;
+  PROCESSING_MODE procMode = PROCESSING_MODE.NO_PROCESSING;
 
   static BetterCamera2Renderer.Settings getCameraSettings() {
     BetterCamera2Renderer.Settings settings = new BetterCamera2Renderer.Settings();
@@ -45,7 +49,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
         CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
     settings.camera_settings.put(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
         CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 1000000L);
+    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 30000000L);
     settings.camera_settings.put(CaptureRequest.LENS_FOCUS_DISTANCE, .2f);
 
     return settings;
@@ -53,6 +57,17 @@ public class CameraView extends BetterCameraGLSurfaceView implements
 
   public CameraView(Context context, AttributeSet attrs) {
     super(context, attrs, getCameraSettings());
+    this.setOnClickListener(new View.OnClickListener() {
+
+      @Override
+      public void onClick(View v) {
+        if (procMode == PROCESSING_MODE.NO_PROCESSING) {
+          procMode = PROCESSING_MODE.BINARY;
+        } else {
+          procMode = PROCESSING_MODE.NO_PROCESSING;
+        }
+      }
+    });
   }
 
   /**
@@ -75,7 +90,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
   }
 
   /**
-   * Whenever a new camera frame is available, this callback is called
+   * A callback for when  a new camera frame is available
    *
    * @param texIn -  the OpenGL texture ID that contains frame in RGBA format
    * @param texOut - the OpenGL texture ID that can be used to store modified frame image t display
@@ -110,8 +125,12 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     }
 
     // finally, process the image! This calls our native C++ code
-    ImageProcessor.processImage(texIn, texOut, width, height);
+    ImageProcessor.processImage(texIn, texOut, width, height, procMode.ordinal());
 
     return true;
+  }
+
+  public void setProcessingMode(PROCESSING_MODE mode) {
+    procMode = mode;
   }
 }

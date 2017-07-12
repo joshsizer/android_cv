@@ -8,7 +8,10 @@
   <com.team341.daisycv.CameraView
     android:id="@+id/camera_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
   </com.team341.daisycv.CameraView>
 
   <LinearLayout

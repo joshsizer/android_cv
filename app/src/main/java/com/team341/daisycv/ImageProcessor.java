@@ -10,5 +10,10 @@ public class ImageProcessor {
     System.loadLibrary("native-lib");
   }
 
-  public static native void processImage(int texIn, int texOut, int width, int height);
+  public enum PROCESSING_MODE {
+    NO_PROCESSING,
+    BINARY
+  }
+
+  public static native void processImage(int texIn, int texOut, int width, int height, int procMode);
 }

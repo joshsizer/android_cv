@@ -9,7 +9,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.Window;
 import android.view.WindowManager;
-import com.team341.daisycv.network.Client;
 
 public class MainActivity extends Activity {
 
