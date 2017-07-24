@@ -3,7 +3,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context="com.team341.daisycv.MainActivity">
+  tools:context="com.team341.daisycv.LauncherActivity">
 
   <com.team341.daisycv.CameraView
     android:id="@+id/camera_view"

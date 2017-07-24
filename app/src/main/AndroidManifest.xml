@@ -21,15 +21,20 @@
     android:theme="@style/AppTheme">
 
     <activity
-      android:configChanges="keyboardHidden|orientation"
-      android:name=".MainActivity"
-      android:screenOrientation="landscape">
+      android:name=".LauncherActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+
+    <activity
+      android:name=".CameraActivity"
+      android:screenOrientation="landscape"
+      android:configChanges="keyboardHidden|orientation">
+    </activity>
+
   </application>
 
 </manifest>
