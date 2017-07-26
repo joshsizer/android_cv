@@ -12,6 +12,7 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import org.json.*;
 
 /**
  * This class is the launcher of the program. It will handle all "administrative tasks" of this
@@ -26,7 +27,6 @@ public class LauncherActivity extends Activity {
 
   // the alert dialog which shows up if the user denies camera permissions
   private AlertDialog cameraErrorDialog;
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
