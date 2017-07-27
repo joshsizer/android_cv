@@ -1,5 +1,6 @@
 package com.team341.server;
 
+import com.team341.server.messages.HeartbeatMessage;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -10,20 +11,23 @@ public class ClientTest {
   private static int port = 8341;
 
   public static void main(String[] args) {
+    System.out.println(HeartbeatMessage.get().toJSon());
     Socket mSocket;
-    Socket mSocket2;
+    long lastSentHeartBeatTime = System.nanoTime();
     try {
       mSocket = new Socket("localhost", port);
-      System.out.println("mSocket is connected: " + mSocket.isConnected());
-      Thread.sleep(2000);
-      mSocket2 = new Socket("localhost", port);
-      while (mSocket2.isConnected()) {
-        mSocket2.getOutputStream().write("hello!myname is a string\n".getBytes());
+      int count = 0;
+      while (mSocket.isConnected()) {
+        if (System.nanoTime() - lastSentHeartBeatTime > (1000 * 1000 * 1000)) {
+          mSocket.getOutputStream().write((HeartbeatMessage.get().toJSon() + "\n").getBytes());
+          mSocket.getOutputStream().flush();
+          lastSentHeartBeatTime = System.nanoTime();
+          count++;
+        }
+        Thread.sleep(50);
       }
-      System.out.println("mSocket is connected: " + mSocket2.isConnected());
 
       mSocket.close();
-      mSocket2.close();
     } catch (IOException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {

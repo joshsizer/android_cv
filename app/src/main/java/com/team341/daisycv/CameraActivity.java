@@ -31,8 +31,9 @@ public class CameraActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    client = new Client("localhost", 8341);
-    client.start();
+    //client = new Client("localhost", 8341);
+    ClientTest clientTest = new ClientTest(8341);
+    //client.start();
 
     setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera_view);
@@ -43,7 +44,7 @@ public class CameraActivity extends Activity {
   protected void onPause() {
     super.onPause();
     mCameraView.onPause();
-    client.stop();
+    //client.stop();
   }
 
   @Override
@@ -60,6 +61,6 @@ public class CameraActivity extends Activity {
     }
 
     mCameraView.onResume();
-    client.start();
+    //client.start();
   }
 }

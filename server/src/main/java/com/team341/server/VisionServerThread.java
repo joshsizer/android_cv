@@ -5,39 +5,41 @@ import java.io.InputStream;
 import java.net.Socket;
 
 /**
- * Created by joshs on 7/26/2017.
+ * The threads that are spawned by the vision server to handle new socket connections.
+ *
+ * @author Joshua Sizer
  */
-
 public class VisionServerThread implements Runnable {
 
-  private int mId;
   private Socket mSocket;
-  private boolean mRunning;
 
-  public VisionServerThread(Socket socket, int id) {
+  public VisionServerThread(Socket socket) {
     mSocket = socket;
-    mRunning = true;
-    mId = id;
+    System.out.println("Created new vision server thread");
   }
 
+  /**
+   * Reads from the socket for strings, which are formated as JSON strings
+   */
   @Override
   public void run() {
-    int read;
-    InputStream is = null;
-    byte[] buffer = new byte[2048];
     try {
+      int read;
+      InputStream is = null;
+      byte[] buffer = new byte[2048];
+
       is = mSocket.getInputStream();
 
       while (mSocket.isConnected() && (read = is.read(buffer)) != -1) {
-        try {
-          System.out.println("ID: " + mId + " is running");
-          System.out.println(new String(buffer));
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        String[] blah = (new String(buffer)).split("\n");
+        Thread.sleep(1000);
+        System.out.print("Read " + read + " bytes:  " + new String(buffer));
       }
+
+      System.out.println("Vision client socket disconnected!");
     } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
