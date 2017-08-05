@@ -93,7 +93,7 @@ public:
     /**
      * Print log message
      * @param level Log level
-     * @param fmt Message format
+     * @param fmt JsonSerializable format
      * @return
      */
     static int log(int level, const char* fmt, ...)

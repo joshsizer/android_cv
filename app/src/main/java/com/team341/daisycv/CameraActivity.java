@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Window;
 import android.view.WindowManager;
+import com.team341.daisycv.communication.messages.Client;
+import com.team341.daisycv.communication.messages.ClientTest;
 
 /**
  * Created by joshs on 7/23/2017.
