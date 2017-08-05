@@ -1,6 +1,6 @@
-package com.team341.daisycv.communication.messages;
+package com.team341.daisycv.communication;
 
-import com.team341.daisycv.communication.messages.messages.HeartbeatMessage;
+import com.team341.daisycv.communication.messages.HeartbeatMessage;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -21,7 +21,9 @@ public class ClientTest {
         int count = 0;
         while (mSocket.isConnected()) {
           if (System.nanoTime() - lastSentHeartBeatTime > (1000 * 1000 * 1000)) {
-            mSocket.getOutputStream().write((HeartbeatMessage.get().toJson() + "\n").getBytes());
+            mSocket.getOutputStream().write((JsonSerializer.toJson(HeartbeatMessage.getInstance()
+            ) + "\n")
+                .getBytes());
             mSocket.getOutputStream().flush();
             lastSentHeartBeatTime = System.nanoTime();
             count++;

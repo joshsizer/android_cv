@@ -2,15 +2,19 @@ package com.team341.daisycv;
 
 import android.Manifest.permission;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Window;
 import android.view.WindowManager;
-import com.team341.daisycv.communication.messages.Client;
-import com.team341.daisycv.communication.messages.ClientTest;
+import android.widget.TextView;
+import com.team341.daisycv.communication.Client;
+import com.team341.daisycv.communication.ClientTest;
 
 /**
  * Created by joshs on 7/23/2017.
@@ -33,9 +37,11 @@ public class CameraActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    //client = new Client("localhost", 8341);
-    ClientTest clientTest = new ClientTest(8341);
-    //client.start();
+    registerReceiver(new RobotConnectedBroadcastReceiver(),
+        new IntentFilter("com.team341.daiscv.ROBOT_CONNECTED"));
+    client = new Client("localhost", 8341);
+    //ClientTest clientTest = new ClientTest(8341);
+    client.start();
 
     setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera_view);
@@ -46,7 +52,7 @@ public class CameraActivity extends Activity {
   protected void onPause() {
     super.onPause();
     mCameraView.onPause();
-    //client.stop();
+    client.stop();
   }
 
   @Override
@@ -63,6 +69,25 @@ public class CameraActivity extends Activity {
     }
 
     mCameraView.onResume();
-    //client.start();
+    client.start();
+  }
+
+
+  public class RobotConnectedBroadcastReceiver extends BroadcastReceiver {
+
+    public RobotConnectedBroadcastReceiver () {
+
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      TextView connectedText = (TextView) findViewById(R.id.connected_text_view);
+      if (intent.getBooleanExtra("connected", false)) {
+        connectedText.setText("Connected!");
+      } else {
+        connectedText.setText("Not Connected!");
+      }
+    }
   }
 }
+

@@ -42,7 +42,7 @@ extern "C" void process(int texIn, int texOut, int width, int height, int procMo
                   vis.data);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_team341_daisycv_ImageProcessor_processImage(
+extern "C" JNIEXPORT void JNICALL Java_com_team341_daisycv_vision_ImageProcessor_processImage(
     JNIEnv *env,
     jobject, jint texIn, jint texOut, jint width, jint height, int procMode) {
 

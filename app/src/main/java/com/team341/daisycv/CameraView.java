@@ -1,7 +1,5 @@
 package com.team341.daisycv;
 
-import static android.util.Config.LOGD;
-
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.camera2.CaptureRequest;
@@ -9,10 +7,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import com.team341.daisycv.ImageProcessor.PROCESSING_MODE;
+import com.team341.daisycv.vision.ImageProcessor;
+import com.team341.daisycv.vision.ImageProcessor.PROCESSING_MODE;
 import java.util.HashMap;
 import org.opencv.android.BetterCamera2Renderer;
 import org.opencv.android.BetterCameraGLSurfaceView;

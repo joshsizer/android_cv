@@ -12,6 +12,7 @@ import java.net.Socket;
 public class VisionServerThread implements Runnable {
 
   private Socket mSocket;
+  private long lastReceivedHeartbeatTime;
 
   public VisionServerThread(Socket socket) {
     mSocket = socket;
@@ -32,15 +33,18 @@ public class VisionServerThread implements Runnable {
 
       while (mSocket.isConnected() && (read = is.read(buffer)) != -1) {
         String[] blah = (new String(buffer)).split("\n");
-        Thread.sleep(1000);
+        //Thread.sleep(1000);
         System.out.print("Read " + read + " bytes:  " + new String(buffer));
+        long now = System.nanoTime();
+        System.out.println((now - lastReceivedHeartbeatTime) / 1e9);
+        lastReceivedHeartbeatTime = now;
       }
 
       System.out.println("Vision client socket disconnected!");
     } catch (IOException e) {
       e.printStackTrace();
-    } catch (InterruptedException e) {
+    } /* catch (InterruptedException e) {
       e.printStackTrace();
-    }
+    }*/
   }
 }
