@@ -10,10 +10,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import com.team341.daisycv.communication.Client;
+import com.team341.daisycv.communication.client.Client;
 import com.team341.daisycv.communication.ClientTest;
 
 /**
@@ -22,6 +23,7 @@ import com.team341.daisycv.communication.ClientTest;
 
 public class CameraActivity extends Activity {
 
+  public static final String LOGTAG = "CameraActivity";
   private CameraView mCameraView;
   private Client client;
 
@@ -38,7 +40,7 @@ public class CameraActivity extends Activity {
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
     registerReceiver(new RobotConnectedBroadcastReceiver(),
-        new IntentFilter("com.team341.daiscv.ROBOT_CONNECTED"));
+        new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
     client = new Client("localhost", 8341);
     //ClientTest clientTest = new ClientTest(8341);
     client.start();
@@ -50,6 +52,7 @@ public class CameraActivity extends Activity {
 
   @Override
   protected void onPause() {
+    Log.i(LOGTAG, "onPause()");
     super.onPause();
     mCameraView.onPause();
     client.stop();

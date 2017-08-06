@@ -1,4 +1,4 @@
-package com.team341.daisycv.communication;
+package com.team341.daisycv.communication.messages;
 
 import org.json.JSONException;
 import org.json.JSONObject;

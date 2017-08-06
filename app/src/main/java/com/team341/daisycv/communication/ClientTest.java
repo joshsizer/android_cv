@@ -1,6 +1,7 @@
 package com.team341.daisycv.communication;
 
 import com.team341.daisycv.communication.messages.HeartbeatMessage;
+import com.team341.daisycv.communication.messages.JsonSerializer;
 import java.io.IOException;
 import java.net.Socket;
 

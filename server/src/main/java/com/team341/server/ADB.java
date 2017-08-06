@@ -33,6 +33,8 @@ public class ADB {
     return instance;
   }
 
+  private boolean consoleOut = false;
+
   /**
    * So this class cannot be instantiated
    */
@@ -40,6 +42,9 @@ public class ADB {
 
   }
 
+  public void setConsoleOut(boolean out) {
+    consoleOut = out;
+  }
   /**
    * Executes an ADB command on the RoboRIO shell
    *
@@ -50,7 +55,9 @@ public class ADB {
     Runtime runtime = Runtime.getRuntime();
 
     String command = binPath.toString() + " " + args;
-    System.out.println("Executing command:\n\t" + command);
+    if (consoleOut) {
+      System.out.println("Executing command:\n\t" + command);
+    }
 
     try {
       Process process = runtime.exec(command);
@@ -93,8 +100,12 @@ public class ADB {
    * @return true for success, false for failure
    */
   public boolean start() {
-    return execCommandConsoleOut("start-server", "Starting ADB server",
-        "Could not start ADB server");
+    if (consoleOut) {
+      return execCommandConsoleOut("start-server", "Starting ADB server",
+                "Could not start ADB server");
+    } else {
+      return execCommand("start-server");
+    }
   }
 
   /**
@@ -103,8 +114,12 @@ public class ADB {
    * @return true for success, false for failure
    */
   public boolean stop() {
-    return execCommandConsoleOut("kill-server", "Stopping ADB server",
-        "Could not stop ADB server");
+    if (consoleOut) {
+      return execCommandConsoleOut("kill-server", "Stopping ADB server",
+              "Could not stop ADB server");
+    } else {
+      return execCommand("kill-server");
+    }
   }
 
   /**
@@ -113,7 +128,9 @@ public class ADB {
    * @return true for success, false for failure
    */
   public boolean restart() {
-    System.out.println("Attempting to restart the ADB server");
+    if (consoleOut) {
+      System.out.println("Attempting to restart the ADB server");
+    }
 
     boolean stop = stop();
     boolean start = start();
@@ -127,9 +144,13 @@ public class ADB {
    * @return true for success, false for failure
    */
   public boolean portFoward(int port1, int port2) {
-    return execCommandConsoleOut("forward tcp:" + port1 + " tcp:" + port2, "Port "
-        + "forwarded tcp:" + port1 + " and tcp:" + port2, "Could not port "
-        + "forward tcp:" + port1 + " and tcp:" + port2);
+    if (consoleOut) {
+      return execCommandConsoleOut("forward tcp:" + port1 + " tcp:" + port2, "Port "
+          + "forwarded tcp:" + port1 + " and tcp:" + port2, "Could not port "
+          + "forward tcp:" + port1 + " and tcp:" + port2);
+    } else {
+      return execCommand("forward tcp:" + port1 + " tcp:" + port2);
+    }
   }
 
   /**
@@ -138,8 +159,12 @@ public class ADB {
    * @return true for success, false for failure
    */
   public boolean reversePortFoward(int port1, int port2) {
-    return execCommandConsoleOut("reverse tcp:" + port1 + " tcp:" + port2, "Reverse port "
-        + "forwarded tcp:" + port1 + " and tcp:" + port2, "Could not reverse port "
-        + "forward tcp:" + port1 + " and tcp:" + port2);
+    if (consoleOut) {
+      return execCommandConsoleOut("reverse tcp:" + port1 + " tcp:" + port2, "Reverse port "
+              + "forwarded tcp:" + port1 + " and tcp:" + port2, "Could not reverse port "
+              + "forward tcp:" + port1 + " and tcp:" + port2);
+    } else {
+      return execCommand("reverse tcp:" + port1 + " tcp:" + port2);
+    }
   }
 }

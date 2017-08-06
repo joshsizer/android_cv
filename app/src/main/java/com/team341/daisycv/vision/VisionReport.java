@@ -1,6 +1,6 @@
 package com.team341.daisycv.vision;
 
-import com.team341.daisycv.communication.JsonSerializable;
+import com.team341.daisycv.communication.messages.JsonSerializable;
 import java.util.ArrayList;
 import java.util.List;
 

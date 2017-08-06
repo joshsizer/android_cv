@@ -1,6 +1,5 @@
 package com.team341.daisycv.communication.messages;
 
-import com.team341.daisycv.communication.JsonSerializable;
 /**
  * Created by joshs on 7/26/2017.
  */

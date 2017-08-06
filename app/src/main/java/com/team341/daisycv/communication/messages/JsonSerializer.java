@@ -1,6 +1,5 @@
-package com.team341.daisycv.communication;
+package com.team341.daisycv.communication.messages;
 
-import com.team341.daisycv.communication.JsonSerializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
