@@ -9,7 +9,6 @@ import java.net.Socket;
 public abstract class ClientThread extends Thread {
 
   private Client mClient;
-  protected Socket mSocket;
 
   public ClientThread(Client client) {
     mClient = client;
@@ -24,17 +23,14 @@ public abstract class ClientThread extends Thread {
   /**
    * Callback for when the client has connected to the server
    *
-   * @param socket The socket that was connected to
    */
-  public void clientConnected(Socket socket) {
-    mSocket = socket;
+  public void clientConnected() {
   }
 
   /**
    * Callback for when the client is disconnected from the server
    */
   public void clientDisconnected() {
-    mSocket = null;
   }
 
   /**

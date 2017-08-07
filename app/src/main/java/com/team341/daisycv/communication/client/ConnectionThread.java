@@ -26,7 +26,8 @@ public class ConnectionThread extends ClientThread {
   public void run() {
     while (getClient().isEnabled()) {
       try {
-        if ((mSocket == null || !mSocket.isConnected()) && !getClient().isConnected()) {
+        if ((getClient().getSocket() == null || !getClient().getSocket().isConnected()) && !getClient().isConnected
+            ()) {
           getClient().tryConnecting();
           Thread.sleep(250);
         }
@@ -36,6 +37,15 @@ public class ConnectionThread extends ClientThread {
         if ((now - mLastSentHearbeatTime) > 100) {
           getClient().getMessageQueue().offer(HeartbeatMessage.getInstance());
           mLastSentHearbeatTime = now;
+        }
+
+        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) > 800 && getClient().isConnected()) {
+          getClient().notifyDisconnected();
+        }
+
+        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) < 800 && !getClient()
+            .isConnected()) {
+          getClient().notifyConnected();
         }
       } catch (InterruptedException e) {
         e.printStackTrace();

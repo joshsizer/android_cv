@@ -34,16 +34,16 @@ public class WriteThread extends ClientThread {
           continue;
         }
         Log.i(LOGTAG, "Sending message " + JsonSerializer.toJson(message));
-        sendString(JsonSerializer.toJson(message));
+        sendString(JsonSerializer.toJson(message) + "\n");
       }
     }
   }
 
   public void sendString(String message) {
     try {
-      if (mSocket != null) {
-        mSocket.getOutputStream().write(message.getBytes());
-        mSocket.getOutputStream().flush();
+      if (getClient().getSocket() != null && !getClient().getSocket().isClosed()) {
+        getClient().getSocket().getOutputStream().write(message.getBytes());
+        getClient().getSocket().getOutputStream().flush();
       }
     } catch (IOException e) {
       e.printStackTrace();

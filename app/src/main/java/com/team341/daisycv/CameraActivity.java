@@ -39,8 +39,8 @@ public class CameraActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    registerReceiver(new RobotConnectedBroadcastReceiver(),
-        new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
+    //registerReceiver(new RobotConnectedBroadcastReceiver(),
+      //  new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
     client = new Client("localhost", 8341);
     //ClientTest clientTest = new ClientTest(8341);
     client.start();

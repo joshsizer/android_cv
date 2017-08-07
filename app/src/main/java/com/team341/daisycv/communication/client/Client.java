@@ -8,6 +8,7 @@ import com.team341.daisycv.communication.messages.JsonSerializable;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by joshs on 8/6/2017.
@@ -18,13 +19,9 @@ public class Client {
   public static final String LOGTAG = "Client";
 
   private ClientThread mConnectionThread, mWriteThread, mReadThread;
-
   private ArrayBlockingQueue<JsonSerializable> mToSend;
   private Socket mSocket;
-
-  private boolean mEnabled;
-  private boolean mConnected;
-
+  private boolean mEnabled, mConnected;
   private String mHostname;
   private int mPort;
 
@@ -41,7 +38,6 @@ public class Client {
     mWriteThread = new WriteThread(this);
     mReadThread = new ReadThread(this);
 
-    mConnected = false;
     mEnabled = true;
 
     mConnectionThread.start();
@@ -53,10 +49,31 @@ public class Client {
     Log.i(LOGTAG, "stop()");
 
     mEnabled = false;
+    mConnected = false;
 
-    mConnectionThread = null;
-    mWriteThread = null;
-    mReadThread = null;
+    if (mConnectionThread != null && mConnectionThread.isAlive()) {
+      try {
+        mConnectionThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (mWriteThread != null && mWriteThread.isAlive()) {
+      try {
+        mWriteThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (mReadThread != null && mReadThread.isAlive()) {
+      try {
+        mReadThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
 
     try {
       if (mSocket != null) {
@@ -65,31 +82,30 @@ public class Client {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
     mSocket = null;
   }
 
-  synchronized protected boolean isEnabled() {
+  protected boolean isEnabled() {
     return mEnabled;
   }
 
-  synchronized protected boolean isConnected() {
+  protected boolean isConnected() {
     return mConnected;
   }
 
-  synchronized protected void notifyConnected(Socket socket) {
-    mConnectionThread.clientConnected(socket);
-    mWriteThread.clientConnected(socket);
-    mReadThread.clientConnected(socket);
+  synchronized protected void notifyConnected() {
+    mConnected = true;
+    mConnectionThread.clientConnected();
+    mWriteThread.clientConnected();
+    mReadThread.clientConnected();
   }
 
   protected void notifyDisconnected() {
+    mConnected = false;
     mConnectionThread.clientDisconnected();
     mWriteThread.clientDisconnected();
     mReadThread.clientDisconnected();
-  }
-
-  synchronized public void updateLastSentHeartbeatTime(long time) {
-    ((ConnectionThread) mConnectionThread).updateLastSentHeartbeatTime(time);
   }
 
   synchronized public void updateLastReceivedHeartbeatTime(long time) {
@@ -105,8 +121,7 @@ public class Client {
       if (mSocket == null || !mSocket.isConnected()) {
         Log.i(LOGTAG, "Attempting to connect to " + mHostname + ":" + mPort);
         mSocket = new Socket(mHostname, mPort);
-        mConnected = true;
-        notifyConnected(mSocket);
+        notifyConnected();
 
         Log.i(LOGTAG,
             "Connected to " + mSocket.getInetAddress() + ":" + mSocket.getPort());
@@ -118,6 +133,14 @@ public class Client {
 
   synchronized protected ArrayBlockingQueue<JsonSerializable> getMessageQueue() {
     return mToSend;
+  }
+
+  synchronized protected Socket getSocket() {
+    return mSocket;
+  }
+
+  synchronized protected void setSocketNull() {
+    mSocket = null;
   }
 
   protected void broadcastConnected() {
