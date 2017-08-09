@@ -1,24 +1,40 @@
 package com.team341.daisycv.communication.client;
 
 import android.content.Intent;
-import android.provider.Settings.System;
 import android.util.Log;
 import com.team341.daisycv.ApplicationContext;
 import com.team341.daisycv.communication.messages.JsonSerializable;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Created by joshs on 8/6/2017.
+ * A client will connect to a server on the robot.
+ *
+ * The connection thread will monitor the connection status of the socket. The client is
+ * connected to the server in the case that there is a heartbeat message being sent and
+ * received by the client and server. If the time between when a heartbeat message is sent and
+ * received exceeds a threshold, the socket will be closed and a new socket connection will be
+ * made.
+ *
+ * The read thread will read from the socket's input stream and process any messages being sent
+ * from the server. These may include requests to change vision mode, on field game state
+ * updates, and heartbeat messages.
+ *
+ * The write thread will write any messages to the sockets output stream, including vision
+ * messages and heartbeat messages.
+ *
+ * @author Joshua Sizer
+ * @since 8/8/17
  */
-
 public class Client {
 
   public static final String LOGTAG = "Client";
 
-  private ClientThread mConnectionThread, mWriteThread, mReadThread;
+  private ClientThread  mWriteThread, mReadThread;
+  private ConnectionThread mConnectionThread;
   private ArrayBlockingQueue<JsonSerializable> mToSend;
   private Socket mSocket;
   private boolean mEnabled, mConnected;
@@ -31,6 +47,9 @@ public class Client {
     mToSend = new ArrayBlockingQueue<>(20);
   }
 
+  /**
+   * Starts off a connection to the server, which runs on the robot.
+   */
   synchronized public void start() {
     Log.i(LOGTAG, "start()");
 
@@ -38,6 +57,7 @@ public class Client {
     mWriteThread = new WriteThread(this);
     mReadThread = new ReadThread(this);
 
+    mConnected = false;
     mEnabled = true;
 
     mConnectionThread.start();
@@ -49,15 +69,16 @@ public class Client {
     Log.i(LOGTAG, "stop()");
 
     mEnabled = false;
-    mConnected = false;
 
     if (mConnectionThread != null && mConnectionThread.isAlive()) {
       try {
+        Log.i(LOGTAG, "Joining Connection thread");
         mConnectionThread.join();
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
     }
+    Log.i(LOGTAG, "Joined Connection thread");
 
     if (mWriteThread != null && mWriteThread.isAlive()) {
       try {
@@ -66,6 +87,7 @@ public class Client {
         e.printStackTrace();
       }
     }
+    Log.i(LOGTAG, "Joined Write thread");
 
     if (mReadThread != null && mReadThread.isAlive()) {
       try {
@@ -74,6 +96,9 @@ public class Client {
         e.printStackTrace();
       }
     }
+    Log.i(LOGTAG, "Joined Read thread");
+
+    mConnected = false;
 
     try {
       if (mSocket != null) {
@@ -95,21 +120,19 @@ public class Client {
   }
 
   synchronized protected void notifyConnected() {
+    Log.d(LOGTAG, "notifyConnected()");
     mConnected = true;
-    mConnectionThread.clientConnected();
-    mWriteThread.clientConnected();
-    mReadThread.clientConnected();
   }
 
   protected void notifyDisconnected() {
+    Log.d(LOGTAG, "notifyDisconnected()");
     mConnected = false;
-    mConnectionThread.clientDisconnected();
-    mWriteThread.clientDisconnected();
-    mReadThread.clientDisconnected();
   }
 
-  synchronized public void updateLastReceivedHeartbeatTime(long time) {
-    ((ConnectionThread) mConnectionThread).updateLastReceivedHeartbeatTime(time);
+
+  public void updateLastReceivedHeartbeatTime(long time) {
+    Log.i(LOGTAG, "Client.updateLastReceivedHeartbeatTime: " + time);
+    mConnectionThread.updateLastReceivedHeartbeatTime(time);
   }
 
   /**
@@ -118,10 +141,9 @@ public class Client {
   synchronized protected void tryConnecting() {
     Log.i(LOGTAG, "tryConnecting()");
     try {
-      if (mSocket == null || !mSocket.isConnected()) {
+      if (mSocket == null) {
         Log.i(LOGTAG, "Attempting to connect to " + mHostname + ":" + mPort);
         mSocket = new Socket(mHostname, mPort);
-        notifyConnected();
 
         Log.i(LOGTAG,
             "Connected to " + mSocket.getInetAddress() + ":" + mSocket.getPort());

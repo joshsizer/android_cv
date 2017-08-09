@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.Buffer;
+import java.util.concurrent.atomic.AtomicLong;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Handles reading from the socket's input stream
+ * Handles reading from the socket's input stream. This will attempt to read from the socket,
+ * regardless of connection status.
  */
 public class ReadThread extends ClientThread {
 
@@ -23,26 +26,38 @@ public class ReadThread extends ClientThread {
 
   @Override
   public void run() {
-    while (getClient().isEnabled()) {
-      if (getClient().isConnected()) {
+    while (mClient.isEnabled()) {
+      if (mClient.getSocket() != null) {
+        BufferedReader reader;
         try {
-          if (getClient().getSocket() != null && !getClient().getSocket().isClosed()) {
-            InputStream is = getClient().getSocket().getInputStream();
-            reader = new BufferedReader(new InputStreamReader(is));
-            if (reader.ready()) {
-              String message = reader.readLine();
-              Log.i(LOGTAG, "Received message: " + message);
-              try {
-                JSONObject object = new JSONObject(message);
-                if ("heartbeat".equals(object.getString("type"))) {
-                  getClient().updateLastReceivedHeartbeatTime(System.currentTimeMillis());
-                }
-              } catch (JSONException e) {
-                e.printStackTrace();
-              }
-            }
-          }
+          InputStream is = mClient.getSocket().getInputStream();
+          reader = new BufferedReader(new InputStreamReader(is));
         } catch (IOException e) {
+            e.printStackTrace();
+          continue;
+        }
+        String message;
+        try {
+          message = reader.readLine();
+          Log.i(LOGTAG, "Received message: " + message);
+        } catch (IOException e) {
+          e.printStackTrace();
+          continue;
+        }
+        try {
+          JSONObject object = new JSONObject(message);
+          if ("heartbeat".equals(object.getString("type"))) {
+            long now = System.currentTimeMillis();
+            Log.i(LOGTAG, "Now: " + now);
+            mClient.updateLastReceivedHeartbeatTime(now);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      } else {
+        try {
+          Thread.sleep(100, 0);
+        } catch (InterruptedException e) {
           e.printStackTrace();
         }
       }
