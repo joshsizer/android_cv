@@ -43,6 +43,5 @@ public class WriteThread extends ClientThread {
         mClient.setSocketNull();
       }
     }
-
   }
 }

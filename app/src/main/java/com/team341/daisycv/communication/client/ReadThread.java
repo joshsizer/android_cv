@@ -44,11 +44,13 @@ public class ReadThread extends ClientThread {
           e.printStackTrace();
           continue;
         }
+        if (message == null) {
+          continue;
+        }
         try {
           JSONObject object = new JSONObject(message);
           if ("heartbeat".equals(object.getString("type"))) {
             long now = System.currentTimeMillis();
-            Log.i(LOGTAG, "Now: " + now);
             mClient.updateLastReceivedHeartbeatTime(now);
           }
         } catch (JSONException e) {
