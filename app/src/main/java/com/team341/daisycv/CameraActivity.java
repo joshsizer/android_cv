@@ -14,7 +14,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import com.team341.daisycv.communication.client.Client;
+import com.team341.daisycv.communication.Client;
 import com.team341.daisycv.communication.ClientTest;
 
 /**
