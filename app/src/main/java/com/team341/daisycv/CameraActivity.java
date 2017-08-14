@@ -43,7 +43,6 @@ public class CameraActivity extends Activity {
       //  new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
     client = new Client("localhost", 8341);
     //ClientTest clientTest = new ClientTest(8341);
-    client.start();
 
     setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera_view);

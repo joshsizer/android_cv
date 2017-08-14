@@ -50,7 +50,7 @@ public class VisionServer implements Runnable {
         mServerThreads.add(currentServerThread);
         new Thread(currentServerThread, "VServerThread " + mServerThreads.size()).start();
       } catch (IOException e) {
-        //System.out.println("IOException on VisionServer");
+        e.printStackTrace();
       }
     }
   }
