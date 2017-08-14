@@ -23,7 +23,9 @@ public class ADB {
   /**
    * This is where the ADB binary is located on the RoboRIO
    */
-  private Path binPath = Paths.get("/Users/josh/Library/Android/sdk/platform-tools/adb");
+  //private Path binPath = Paths.get("/Users/josh/Library/Android/sdk/platform-tools/adb");
+  private Path binPath = Paths.get("C:\\Users\\joshs\\AppData\\Local\\Android\\sdk\\platform"
+          + "-tools\\adb.exe");
 
   /**
    * @return the only instance of this class

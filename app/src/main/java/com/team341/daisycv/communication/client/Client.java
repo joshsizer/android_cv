@@ -70,9 +70,19 @@ public class Client {
 
     mEnabled = false;
 
+    try {
+      if (mSocket != null) {
+        mSocket.close();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    mSocket = null;
+    notifyDisconnected();
+
     if (mConnectionThread != null && mConnectionThread.isAlive()) {
       try {
-        Log.i(LOGTAG, "Joining Connection thread");
         mConnectionThread.join();
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -97,18 +107,6 @@ public class Client {
       }
     }
     Log.i(LOGTAG, "Joined Read thread");
-
-    mConnected = false;
-
-    try {
-      if (mSocket != null) {
-        mSocket.close();
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    mSocket = null;
   }
 
   protected boolean isEnabled() {
@@ -122,16 +120,17 @@ public class Client {
   synchronized protected void notifyConnected() {
     Log.d(LOGTAG, "notifyConnected()");
     mConnected = true;
+    broadcastConnected();
   }
 
   protected void notifyDisconnected() {
     Log.d(LOGTAG, "notifyDisconnected()");
     mConnected = false;
+    broadcastDisconnected();
   }
 
 
   public void updateLastReceivedHeartbeatTime(long time) {
-    Log.i(LOGTAG, "Client.updateLastReceivedHeartbeatTime: " + time);
     mConnectionThread.updateLastReceivedHeartbeatTime(time);
   }
 

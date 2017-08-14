@@ -27,8 +27,8 @@ public class VisionServer implements Runnable {
     try {
       mServerSocket = new ServerSocket(port);
       mServerSocket.setSoTimeout(500);
-      //ADB.getInstance().start();
-      //ADB.getInstance().reversePortFoward(8341, 8341);
+      ADB.getInstance().start();
+      ADB.getInstance().reversePortFoward(8341, 8341);
       new Thread(this).start();
     } catch (IOException e) {
       e.printStackTrace();
@@ -43,8 +43,8 @@ public class VisionServer implements Runnable {
   public void run() {
     while (true) {
       try {
-        //ADB.getInstance().start();
-        //ADB.getInstance().reversePortFoward(8341, 8341);
+        ADB.getInstance().start();
+        ADB.getInstance().reversePortFoward(8341, 8341);
         Socket currentSocket = mServerSocket.accept();
         VisionServerThread currentServerThread = new VisionServerThread(currentSocket);
         mServerThreads.add(currentServerThread);

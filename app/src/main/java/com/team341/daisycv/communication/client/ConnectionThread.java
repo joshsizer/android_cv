@@ -26,7 +26,6 @@ public class ConnectionThread extends ClientThread {
   @Override
   public void run() {
     while (mClient.isEnabled()) {
-      Log.i(LOGTAG, "LOPPED()");
       try {
         if ((mClient.getSocket() == null || !mClient.getSocket().isConnected()) && !mClient.isConnected()) {
           mClient.tryConnecting();
@@ -40,29 +39,20 @@ public class ConnectionThread extends ClientThread {
           mLastSentHearbeatTime = now;
         }
 
-        synchronized (this) {
-          if (mLastReceivedHearbeatTime == 0) {
-            Log.i(LOGTAG, "True");
-          }
-          Log.i(LOGTAG, "l received hb time: " + mLastReceivedHearbeatTime);
-        }
-
         //Log.i(LOGTAG, "l sent hb time: " + mLastSentHearbeatTime);
         //Log.i(LOGTAG, "l received - sent hb time: " + (mLastReceivedHearbeatTime -
         //    mLastSentHearbeatTime));
 
-        /*
         if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) > 800 && mClient.isConnected()) {
           mClient.notifyDisconnected();
-        } */
+        }
 
-        /*
         if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) < 800 && !mClient
             .isConnected()) {
           mClient.notifyConnected();
-        } */
+        }
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -71,7 +61,6 @@ public class ConnectionThread extends ClientThread {
   }
 
   public synchronized void updateLastReceivedHeartbeatTime(long time) {
-    Log.i(LOGTAG, "updateLastRecievedHeartbeatTime" + time);
     mLastReceivedHearbeatTime = time;
   }
 }

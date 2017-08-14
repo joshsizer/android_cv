@@ -39,11 +39,12 @@ public class CameraActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    //registerReceiver(new RobotConnectedBroadcastReceiver(),
-      //  new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
+    registerReceiver(new RobotConnectedBroadcastReceiver(),
+        new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
+    registerReceiver(new RobotDisconnectedBroadcastReceiver(), new IntentFilter("com"
+        + ".team341.daisycv.ROBOT_DISCONNECTED"));
     client = new Client("localhost", 8341);
     //ClientTest clientTest = new ClientTest(8341);
-    client.start();
 
     setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera_view);
@@ -78,18 +79,19 @@ public class CameraActivity extends Activity {
 
   public class RobotConnectedBroadcastReceiver extends BroadcastReceiver {
 
-    public RobotConnectedBroadcastReceiver () {
-
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      TextView connectedText = (TextView) findViewById(R.id.connected_text_view);
+      connectedText.setText("Connected");
     }
+  }
+
+  public class RobotDisconnectedBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
       TextView connectedText = (TextView) findViewById(R.id.connected_text_view);
-      if (intent.getBooleanExtra("connected", false)) {
-        connectedText.setText("Connected!");
-      } else {
-        connectedText.setText("Not Connected!");
-      }
+      connectedText.setText("Disconnected");
     }
   }
 }
