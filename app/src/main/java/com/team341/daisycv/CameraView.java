@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.team341.daisycv.vision.ImageProcessor;
-import com.team341.daisycv.vision.ImageProcessor.PROCESSING_MODE;
 import java.util.HashMap;
 import org.opencv.android.BetterCamera2Renderer;
 import org.opencv.android.BetterCameraGLSurfaceView;
@@ -35,7 +34,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
   static final int kHeight = 480;
   static final int kWidth = 640;
 
-  PROCESSING_MODE procMode = PROCESSING_MODE.NO_PROCESSING;
+  int procMode = ImageProcessor.DISP_MODE_TARGETS;
 
   static BetterCamera2Renderer.Settings getCameraSettings() {
     BetterCamera2Renderer.Settings settings = new BetterCamera2Renderer.Settings();
@@ -59,10 +58,10 @@ public class CameraView extends BetterCameraGLSurfaceView implements
 
       @Override
       public void onClick(View v) {
-        if (procMode == PROCESSING_MODE.NO_PROCESSING) {
-          procMode = PROCESSING_MODE.BINARY;
+        if (procMode == ImageProcessor.DISP_MODE_RAW) {
+          procMode = ImageProcessor.DISP_MODE_THRESH;
         } else {
-          procMode = PROCESSING_MODE.NO_PROCESSING;
+          procMode = ImageProcessor.DISP_MODE_RAW;
         }
       }
     });
@@ -122,13 +121,14 @@ public class CameraView extends BetterCameraGLSurfaceView implements
       mLastNanoTime = System.nanoTime();
     }
 
+    ImageProcessor.TargetsInfo dest = new ImageProcessor.TargetsInfo();
     // finally, process the image! This calls our native C++ code
-    ImageProcessor.processImage(texIn, texOut, width, height, procMode.ordinal());
+    ImageProcessor.processImage(texIn, texOut, width, height, procMode, 0, 255, 0, 255, 0, 255, dest);
 
     return true;
   }
 
-  public void setProcessingMode(PROCESSING_MODE mode) {
+  public void setProcessingMode(int mode) {
     procMode = mode;
   }
 }

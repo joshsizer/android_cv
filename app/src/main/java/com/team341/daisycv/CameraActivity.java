@@ -27,6 +27,9 @@ public class CameraActivity extends Activity {
   private CameraView mCameraView;
   private Client client;
 
+  private BroadcastReceiver robotConnectedReceiver;
+  private BroadcastReceiver robotDisconnectedReceiver;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -39,9 +42,11 @@ public class CameraActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    registerReceiver(new RobotConnectedBroadcastReceiver(),
-        new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
-    registerReceiver(new RobotDisconnectedBroadcastReceiver(), new IntentFilter("com"
+    robotConnectedReceiver = new RobotConnectedBroadcastReceiver();
+    robotDisconnectedReceiver = new RobotDisconnectedBroadcastReceiver();
+
+    registerReceiver(robotConnectedReceiver, new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
+    registerReceiver(robotDisconnectedReceiver, new IntentFilter("com"
         + ".team341.daisycv.ROBOT_DISCONNECTED"));
     client = new Client("localhost", 8341);
     //ClientTest clientTest = new ClientTest(8341);
@@ -57,6 +62,9 @@ public class CameraActivity extends Activity {
     super.onPause();
     mCameraView.onPause();
     client.stop();
+
+    unregisterReceiver(robotConnectedReceiver);
+    unregisterReceiver(robotDisconnectedReceiver);
   }
 
   @Override
