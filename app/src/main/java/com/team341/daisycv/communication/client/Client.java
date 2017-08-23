@@ -83,6 +83,7 @@ public class Client {
 
     if (mConnectionThread != null && mConnectionThread.isAlive()) {
       try {
+        mConnectionThread.interrupt();
         mConnectionThread.join();
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -143,12 +144,13 @@ public class Client {
       if (mSocket == null) {
         Log.i(LOGTAG, "Attempting to connect to " + mHostname + ":" + mPort);
         mSocket = new Socket(mHostname, mPort);
-
+        mSocket.setSoTimeout(100);
         Log.i(LOGTAG,
             "Connected to " + mSocket.getInetAddress() + ":" + mSocket.getPort());
       }
     } catch (IOException e) {
       Log.e(LOGTAG, "Cannot connect to server!");
+      mSocket = null;
     }
   }
 

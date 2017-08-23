@@ -7,6 +7,7 @@ import com.team341.daisycv.communication.messages.HeartbeatMessage;
 import com.team341.daisycv.communication.messages.JsonSerializer;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -35,10 +36,13 @@ public class ConnectionThread extends ClientThread {
         long now = System.currentTimeMillis();
 
         if ((now - mLastSentHearbeatTime) > 100) {
-          mClient.getMessageQueue().offer(HeartbeatMessage.getInstance());
+          Log.i(LOGTAG, "before offer");
+          Log.i(LOGTAG, "messageQueue() size" + mClient.getMessageQueue().size());
+          mClient.getMessageQueue().offer(HeartbeatMessage.getInstance(), 100, TimeUnit.MILLISECONDS);
           mLastSentHearbeatTime = now;
         }
 
+        Log.i(LOGTAG, "after offer");
         //Log.i(LOGTAG, "l sent hb time: " + mLastSentHearbeatTime);
         //Log.i(LOGTAG, "l received - sent hb time: " + (mLastReceivedHearbeatTime -
         //    mLastSentHearbeatTime));
