@@ -25,7 +25,6 @@ public class CameraActivity extends Activity {
 
   public static final String LOGTAG = "CameraActivity";
   private CameraView mCameraView;
-  private Client client;
 
   private BroadcastReceiver robotConnectedReceiver;
   private BroadcastReceiver robotDisconnectedReceiver;
@@ -45,10 +44,7 @@ public class CameraActivity extends Activity {
     robotConnectedReceiver = new RobotConnectedBroadcastReceiver();
     robotDisconnectedReceiver = new RobotDisconnectedBroadcastReceiver();
 
-    registerReceiver(robotConnectedReceiver, new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
-    registerReceiver(robotDisconnectedReceiver, new IntentFilter("com"
-        + ".team341.daisycv.ROBOT_DISCONNECTED"));
-    client = new Client("localhost", 8341);
+
     //ClientTest clientTest = new ClientTest(8341);
 
     setContentView(R.layout.activity_camera);
@@ -61,7 +57,6 @@ public class CameraActivity extends Activity {
     Log.i(LOGTAG, "onPause()");
     super.onPause();
     mCameraView.onPause();
-    client.stop();
 
     unregisterReceiver(robotConnectedReceiver);
     unregisterReceiver(robotDisconnectedReceiver);
@@ -80,8 +75,11 @@ public class CameraActivity extends Activity {
       return;
     }
 
+    registerReceiver(robotConnectedReceiver, new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
+    registerReceiver(robotDisconnectedReceiver, new IntentFilter("com"
+            + ".team341.daisycv.ROBOT_DISCONNECTED"));
+
     mCameraView.onResume();
-    client.start();
   }
 
 

@@ -3,6 +3,9 @@ package com.team341.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,7 +20,10 @@ public class VisionServerThread implements Runnable {
   private Socket mSocket;
   private long lastReceivedHeartbeatTime;
 
-  public VisionServerThread(Socket socket) {
+  private ArrayList<VisionUpdateReceiver> mReceivers;
+
+  public VisionServerThread(Socket socket, ArrayList<VisionUpdateReceiver> receivers) {
+    mReceivers = receivers;
     mSocket = socket;
     System.out.println("Created new vision server thread");
   }
@@ -35,22 +41,45 @@ public class VisionServerThread implements Runnable {
       is = mSocket.getInputStream();
 
       while (mSocket.isConnected() && (read = is.read(buffer)) != -1) {
-        String[] blah = (new String(buffer)).split("\n");
+        String[] splitMessages = (new String(buffer, 0, read)).split("\n");
         //Thread.sleep(1000);
-        System.out.print("Read " + read + " bytes:  " + blah[0] + "\n");
-        long now = System.nanoTime();
-        System.out.println((now - lastReceivedHeartbeatTime) / 1e9);
-        lastReceivedHeartbeatTime = now;
 
-        try {
-          JSONParser jsonParser = new JSONParser();
-          JSONObject j = (JSONObject) jsonParser.parse(blah[0]);
-          if ("heartbeat".equals((String) j.get("type"))) {
-            mSocket.getOutputStream().write((blah[0] + "\n").getBytes());
-            mSocket.getOutputStream().flush();
+        for (String line : splitMessages) {
+          //System.out.print("Read " + read + " bytes:  " + line + "\n");
+          long now = System.nanoTime();
+          //System.out.println((now - lastReceivedHeartbeatTime) / 1e9);
+          lastReceivedHeartbeatTime = now;
+
+          try {
+            JSONParser jsonParser = new JSONParser();
+            JSONObject j = (JSONObject) jsonParser.parse(line);
+            if ("heartbeat".equals(j.get("type"))) {
+              mSocket.getOutputStream().write((line + "\n").getBytes());
+              mSocket.getOutputStream().flush();
+            } else if ("VisionReport".equals(j.get("type"))) {
+              JSONObject message = (JSONObject) jsonParser.parse((String) j.get("message"));
+              JSONArray arr = (JSONArray) message.get("targets");
+
+
+              VisionReport report = new VisionReport();
+
+              for (int i = 0; i < arr.size(); i++) {
+                JSONObject jsonTarget = (JSONObject) arr.get(i);
+                Target target = new Target();
+                target.setRange((double) jsonTarget.get("range"));
+                target.setAzimuth((double) jsonTarget.get("azimuth"));
+                target.setWidth((double) jsonTarget.get("width"));
+                target.setHeight((double) jsonTarget.get("height"));
+                report.addTarget(target);
+              }
+
+              for (VisionUpdateReceiver receiver : mReceivers) {
+                receiver.updateReceived(report);
+              }
+            }
+          } catch (ParseException e) {
+            e.printStackTrace();
           }
-        } catch (ParseException e) {
-          e.printStackTrace();
         }
       }
 

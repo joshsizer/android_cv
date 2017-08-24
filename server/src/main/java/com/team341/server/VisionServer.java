@@ -16,6 +16,8 @@ public class VisionServer implements Runnable {
 
   private ServerSocket mServerSocket;
   private ArrayList<VisionServerThread> mServerThreads;
+  private ArrayList<VisionUpdateReceiver> mReceivers;
+
 
   /**
    * Attempts to bind a server socket to the specified port
@@ -24,6 +26,8 @@ public class VisionServer implements Runnable {
    */
   public VisionServer(int port) {
     mServerThreads = new ArrayList<>();
+    mReceivers = new ArrayList<>();
+
     try {
       mServerSocket = new ServerSocket(port);
       mServerSocket.setSoTimeout(500);
@@ -46,7 +50,7 @@ public class VisionServer implements Runnable {
         ADB.getInstance().start();
         ADB.getInstance().reversePortFoward(8341, 8341);
         Socket currentSocket = mServerSocket.accept();
-        VisionServerThread currentServerThread = new VisionServerThread(currentSocket);
+        VisionServerThread currentServerThread = new VisionServerThread(currentSocket, mReceivers);
         mServerThreads.add(currentServerThread);
         new Thread(currentServerThread, "VServerThread " + mServerThreads.size()).start();
       } catch (IOException e) {
@@ -57,5 +61,10 @@ public class VisionServer implements Runnable {
 
   public static void main(String[] args) {
     VisionServer vs = new VisionServer(8341);
+    vs.registerReceiver(new TestReceiver());
+  }
+
+  public void registerReceiver(VisionUpdateReceiver receiver) {
+    mReceivers.add(receiver);
   }
 }

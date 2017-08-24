@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.util.Log;
 import com.team341.daisycv.ApplicationContext;
 import com.team341.daisycv.communication.messages.JsonSerializable;
+import com.team341.daisycv.vision.VisionReport;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -152,6 +154,10 @@ public class Client {
       Log.e(LOGTAG, "Cannot connect to server!");
       mSocket = null;
     }
+  }
+
+  public void sendVisionReport(VisionReport report) {
+    getMessageQueue().offer(report);
   }
 
   synchronized protected ArrayBlockingQueue<JsonSerializable> getMessageQueue() {

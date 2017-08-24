@@ -32,7 +32,7 @@ public class ReadThread extends ClientThread {
         try {
           InputStream is = mClient.getSocket().getInputStream();
           reader = new BufferedReader(new InputStreamReader(is));
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
           continue;
         }

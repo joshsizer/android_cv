@@ -1,11 +1,18 @@
 package com.team341.daisycv.vision;
 
+import android.util.Log;
+
 import com.team341.daisycv.communication.messages.JsonSerializable;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by joshs on 8/4/2017.
+ * This is the message that will be sent to the robot!
  */
 public class VisionReport implements JsonSerializable {
 
@@ -34,12 +41,24 @@ public class VisionReport implements JsonSerializable {
 
   @Override
   public String getType() {
-    return "VisionUpdate";
+    return "VisionReport";
   }
 
   @Override
   public String getMessage() {
-    // todo: return string representation of the VisionUpdate
-    return null;
+    JSONObject message = new JSONObject();
+    JSONArray targets = new JSONArray();
+    for (Target target : mTargets) {
+      if (target != null) {
+        targets.put(target.getJsonObject());
+      }
+    }
+    try {
+      message.put("targets", targets);
+      message.put("timestamp", getTimestamp());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return message.toString();
   }
 }

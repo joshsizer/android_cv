@@ -9,7 +9,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import com.team341.daisycv.communication.client.Client;
 import com.team341.daisycv.vision.ImageProcessor;
+import com.team341.daisycv.vision.Target;
+import com.team341.daisycv.vision.VisionReport;
+
 import java.util.HashMap;
 import org.opencv.android.BetterCamera2Renderer;
 import org.opencv.android.BetterCameraGLSurfaceView;
@@ -26,6 +31,8 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     BetterCameraGLSurfaceView.CameraTextureListener {
 
   public static String LOGTAG = "CameraView";
+
+  private Client client;
 
   private TextView mFpsText;
   private int mFrameCounter;
@@ -46,7 +53,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
         CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
     settings.camera_settings.put(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
         CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 30000000L);
+    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 10000000L);
     settings.camera_settings.put(CaptureRequest.LENS_FOCUS_DISTANCE, .2f);
 
     return settings;
@@ -59,12 +66,14 @@ public class CameraView extends BetterCameraGLSurfaceView implements
       @Override
       public void onClick(View v) {
         if (procMode == ImageProcessor.DISP_MODE_RAW) {
-          procMode = ImageProcessor.DISP_MODE_THRESH;
+          procMode = ImageProcessor.DISP_MODE_TARGETS;
         } else {
           procMode = ImageProcessor.DISP_MODE_RAW;
         }
       }
     });
+
+    client = new Client("localhost", 8341);
   }
 
   /**
@@ -123,9 +132,35 @@ public class CameraView extends BetterCameraGLSurfaceView implements
 
     ImageProcessor.TargetsInfo dest = new ImageProcessor.TargetsInfo();
     // finally, process the image! This calls our native C++ code
-    ImageProcessor.processImage(texIn, texOut, width, height, procMode, 0, 255, 0, 255, 0, 255, dest);
+    ImageProcessor.processImage(texIn, texOut, width, height, procMode, 45, 60, 89, 255, 100, 255, dest);
+
+    VisionReport report = new VisionReport();
+
+    for (int i = 0; i < dest.numTargets; i++) {
+      Target target = new Target();
+      target.setAzimuth(dest.targets[i].x);
+      target.setRange(dest.targets[i].y);
+      target.setHeight(dest.targets[i].height);
+      target.setWidth(dest.targets[i].width);
+      report.addTarget(target);
+      report.setTimestamp(timeStamp);
+    }
+
+    client.sendVisionReport(report);
 
     return true;
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    client.stop();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    client.start();
   }
 
   public void setProcessingMode(int mode) {
