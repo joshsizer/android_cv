@@ -9,12 +9,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
 import com.team341.daisycv.communication.client.Client;
 import com.team341.daisycv.vision.ImageProcessor;
 import com.team341.daisycv.vision.Target;
 import com.team341.daisycv.vision.VisionReport;
-
 import java.util.HashMap;
 import org.opencv.android.BetterCamera2Renderer;
 import org.opencv.android.BetterCameraGLSurfaceView;
@@ -30,34 +28,14 @@ import org.opencv.android.BetterCameraGLSurfaceView;
 public class CameraView extends BetterCameraGLSurfaceView implements
     BetterCameraGLSurfaceView.CameraTextureListener {
 
+  static final int kHeight = 480;
+  static final int kWidth = 640;
   public static String LOGTAG = "CameraView";
-
+  int procMode = ImageProcessor.DISP_MODE_TARGETS;
   private Client client;
-
   private TextView mFpsText;
   private int mFrameCounter;
   private long mLastNanoTime;
-
-  static final int kHeight = 480;
-  static final int kWidth = 640;
-
-  int procMode = ImageProcessor.DISP_MODE_TARGETS;
-
-  static BetterCamera2Renderer.Settings getCameraSettings() {
-    BetterCamera2Renderer.Settings settings = new BetterCamera2Renderer.Settings();
-    settings.height = kHeight;
-    settings.width = kWidth;
-    settings.camera_settings = new HashMap<>();
-    settings.camera_settings.put(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
-        CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
-        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 10000000L);
-    settings.camera_settings.put(CaptureRequest.LENS_FOCUS_DISTANCE, .2f);
-
-    return settings;
-  }
 
   public CameraView(Context context, AttributeSet attrs) {
     super(context, attrs, getCameraSettings());
@@ -74,6 +52,22 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     });
 
     client = new Client("localhost", 8341);
+  }
+
+  static BetterCamera2Renderer.Settings getCameraSettings() {
+    BetterCamera2Renderer.Settings settings = new BetterCamera2Renderer.Settings();
+    settings.height = kHeight;
+    settings.width = kWidth;
+    settings.camera_settings = new HashMap<>();
+    settings.camera_settings.put(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
+    settings.camera_settings.put(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
+        CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
+    settings.camera_settings.put(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
+        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF);
+    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 10000000L);
+    settings.camera_settings.put(CaptureRequest.LENS_FOCUS_DISTANCE, .2f);
+
+    return settings;
   }
 
   /**
@@ -132,7 +126,8 @@ public class CameraView extends BetterCameraGLSurfaceView implements
 
     ImageProcessor.TargetsInfo dest = new ImageProcessor.TargetsInfo();
     // finally, process the image! This calls our native C++ code
-    ImageProcessor.processImage(texIn, texOut, width, height, procMode, 45, 60, 89, 255, 100, 255, dest);
+    ImageProcessor
+        .processImage(texIn, texOut, width, height, procMode, 45, 60, 89, 255, 100, 255, dest);
 
     VisionReport report = new VisionReport();
 

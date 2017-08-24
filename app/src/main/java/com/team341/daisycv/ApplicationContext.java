@@ -11,12 +11,12 @@ public class ApplicationContext extends Application {
 
   private static Context context;
 
+  public static Context get() {
+    return ApplicationContext.context;
+  }
+
   public void onCreate() {
     super.onCreate();
     ApplicationContext.context = getApplicationContext();
-  }
-
-  public static Context get() {
-    return ApplicationContext.context;
   }
 }

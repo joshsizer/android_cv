@@ -5,12 +5,9 @@ import android.util.Log;
 import com.team341.daisycv.ApplicationContext;
 import com.team341.daisycv.communication.messages.JsonSerializable;
 import com.team341.daisycv.vision.VisionReport;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A client will connect to a server on the robot.
@@ -35,7 +32,7 @@ public class Client {
 
   public static final String LOGTAG = "Client";
 
-  private ClientThread  mWriteThread, mReadThread;
+  private ClientThread mWriteThread, mReadThread;
   private ConnectionThread mConnectionThread;
   private ArrayBlockingQueue<JsonSerializable> mToSend;
   private Socket mSocket;

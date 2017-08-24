@@ -11,6 +11,10 @@ import java.net.Socket;
 
 public class ClientTest {
 
+  public ClientTest(int port) {
+    new Thread(new ConnectionThread()).start();
+  }
+
   protected class ConnectionThread implements Runnable {
 
     @Override
@@ -39,10 +43,6 @@ public class ClientTest {
         e.printStackTrace();
       }
     }
-  }
-
-  public ClientTest(int port) {
-    new Thread(new ConnectionThread()).start();
   }
 
 }

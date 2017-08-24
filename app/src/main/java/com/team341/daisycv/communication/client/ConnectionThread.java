@@ -1,14 +1,8 @@
 package com.team341.daisycv.communication.client;
 
-import android.content.Intent;
 import android.util.Log;
-import com.team341.daisycv.ApplicationContext;
 import com.team341.daisycv.communication.messages.HeartbeatMessage;
-import com.team341.daisycv.communication.messages.JsonSerializer;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by joshs on 8/6/2017.
@@ -28,7 +22,8 @@ public class ConnectionThread extends ClientThread {
   public void run() {
     while (mClient.isEnabled()) {
       try {
-        if ((mClient.getSocket() == null || !mClient.getSocket().isConnected()) && !mClient.isConnected()) {
+        if ((mClient.getSocket() == null || !mClient.getSocket().isConnected()) && !mClient
+            .isConnected()) {
           mClient.tryConnecting();
           Thread.sleep(250);
         }
@@ -38,7 +33,8 @@ public class ConnectionThread extends ClientThread {
         if ((now - mLastSentHearbeatTime) > 100) {
           Log.i(LOGTAG, "before offer");
           Log.i(LOGTAG, "messageQueue() size" + mClient.getMessageQueue().size());
-          mClient.getMessageQueue().offer(HeartbeatMessage.getInstance(), 100, TimeUnit.MILLISECONDS);
+          mClient.getMessageQueue()
+              .offer(HeartbeatMessage.getInstance(), 100, TimeUnit.MILLISECONDS);
           mLastSentHearbeatTime = now;
         }
 
@@ -47,7 +43,8 @@ public class ConnectionThread extends ClientThread {
         //Log.i(LOGTAG, "l received - sent hb time: " + (mLastReceivedHearbeatTime -
         //    mLastSentHearbeatTime));
 
-        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) > 800 && mClient.isConnected()) {
+        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) > 800 && mClient
+            .isConnected()) {
           mClient.notifyDisconnected();
         }
 

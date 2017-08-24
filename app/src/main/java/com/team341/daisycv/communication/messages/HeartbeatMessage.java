@@ -8,11 +8,12 @@ public class HeartbeatMessage implements JsonSerializable {
 
   private static HeartbeatMessage instance = new HeartbeatMessage();
 
+  private HeartbeatMessage() {
+  }
+
   public static HeartbeatMessage getInstance() {
     return instance;
   }
-
-  private HeartbeatMessage() {}
 
   @Override
   public String getType() {

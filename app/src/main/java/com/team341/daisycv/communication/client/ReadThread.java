@@ -5,9 +5,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Socket;
-import java.nio.Buffer;
-import java.util.concurrent.atomic.AtomicLong;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,7 +30,7 @@ public class ReadThread extends ClientThread {
           InputStream is = mClient.getSocket().getInputStream();
           reader = new BufferedReader(new InputStreamReader(is));
         } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
+          e.printStackTrace();
           continue;
         }
         String message;

@@ -12,7 +12,6 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import org.json.*;
 
 /**
  * This class is the launcher of the program. It will handle all "administrative tasks" of this

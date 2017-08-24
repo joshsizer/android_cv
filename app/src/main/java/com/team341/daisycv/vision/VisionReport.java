@@ -1,15 +1,11 @@
 package com.team341.daisycv.vision;
 
-import android.util.Log;
-
 import com.team341.daisycv.communication.messages.JsonSerializable;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is the message that will be sent to the robot!

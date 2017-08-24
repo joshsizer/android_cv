@@ -1,8 +1,5 @@
 package com.team341.daisycv.communication.messages;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Simple interface that enables any object to be serialized. If an object is able to be
  * serialized, the object should be able to be recreated using some sort of deserialization
@@ -13,5 +10,6 @@ import org.json.JSONObject;
 public interface JsonSerializable {
 
   String getType();
+
   String getMessage();
 }

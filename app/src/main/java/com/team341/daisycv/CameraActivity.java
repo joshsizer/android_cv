@@ -14,8 +14,6 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import com.team341.daisycv.communication.client.Client;
-import com.team341.daisycv.communication.ClientTest;
 
 /**
  * Created by joshs on 7/23/2017.
@@ -43,7 +41,6 @@ public class CameraActivity extends Activity {
 
     robotConnectedReceiver = new RobotConnectedBroadcastReceiver();
     robotDisconnectedReceiver = new RobotDisconnectedBroadcastReceiver();
-
 
     //ClientTest clientTest = new ClientTest(8341);
 
@@ -75,9 +72,10 @@ public class CameraActivity extends Activity {
       return;
     }
 
-    registerReceiver(robotConnectedReceiver, new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
+    registerReceiver(robotConnectedReceiver,
+        new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
     registerReceiver(robotDisconnectedReceiver, new IntentFilter("com"
-            + ".team341.daisycv.ROBOT_DISCONNECTED"));
+        + ".team341.daisycv.ROBOT_DISCONNECTED"));
 
     mCameraView.onResume();
   }

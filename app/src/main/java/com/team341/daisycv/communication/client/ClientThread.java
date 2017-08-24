@@ -1,7 +1,5 @@
 package com.team341.daisycv.communication.client;
 
-import java.net.Socket;
-
 /**
  * Created by joshs on 8/6/2017.
  */
