@@ -18,21 +18,21 @@ import org.opencv.android.BetterCamera2Renderer;
 import org.opencv.android.BetterCameraGLSurfaceView;
 
 /**
- * This is the main view for providing images to the display. Thanks to 254 for providing a
- * "Better" implementation of CameraGLSurfaceView that takes Camera Settings as an input, and
- * provides a relevant timestamp for when the capture was started. This allows you to set the
- * camera exposure, capture size, width, ect. They also do the work of calculating the Camera's
- * field of view.
+ * This is the main view for providing images to the display. Thanks to 254 for
+ * providing a "Better" implementation of CameraGLSurfaceView that takes Camera
+ * Settings as an input, and provides a relevant timestamp for when the capture
+ * was started. This allows you to set the camera exposure, capture size, width,
+ * ect. They also do the work of calculating the Camera's field of view.
  */
 
 public class CameraView extends BetterCameraGLSurfaceView implements
     BetterCameraGLSurfaceView.CameraTextureListener {
 
-  static final int kHeight = 480;
-  static final int kWidth = 640;
-  public static String LOGTAG = "CameraView";
-  int procMode = ImageProcessor.DISP_MODE_TARGETS;
-  private Client client;
+  private static final int kHeight = 480;
+  private static final int kWidth = 640;
+  private static final String LOGTAG = "CameraView";
+  private int procMode = ImageProcessor.DISP_MODE_TARGETS;
+  private final Client client;
   private TextView mFpsText;
   private int mFrameCounter;
   private long mLastNanoTime;
@@ -54,17 +54,20 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     client = new Client("localhost", 8341);
   }
 
-  static BetterCamera2Renderer.Settings getCameraSettings() {
+  private static BetterCamera2Renderer.Settings getCameraSettings() {
     BetterCamera2Renderer.Settings settings = new BetterCamera2Renderer.Settings();
     settings.height = kHeight;
     settings.width = kWidth;
     settings.camera_settings = new HashMap<>();
-    settings.camera_settings.put(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
-        CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
+    settings.camera_settings
+        .put(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
+    settings.camera_settings
+        .put(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
+            CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
     settings.camera_settings.put(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
         CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF);
-    settings.camera_settings.put(CaptureRequest.SENSOR_EXPOSURE_TIME, 10000000L);
+    settings.camera_settings
+        .put(CaptureRequest.SENSOR_EXPOSURE_TIME, 10000000L);
     settings.camera_settings.put(CaptureRequest.LENS_FOCUS_DISTANCE, .2f);
 
     return settings;
@@ -93,18 +96,21 @@ public class CameraView extends BetterCameraGLSurfaceView implements
    * A callback for when  a new camera frame is available
    *
    * @param texIn -  the OpenGL texture ID that contains frame in RGBA format
-   * @param texOut - the OpenGL texture ID that can be used to store modified frame image t display
+   * @param texOut - the OpenGL texture ID that can be used to store modified
+   * frame image t display
    * @param width -  the width of the frame
    * @param height - the height of the frame
-   * @return True if we have processed the frame and want to draw the processed frame, false
-   * otherwise
+   * @return True if we have processed the frame and want to draw the processed
+   * frame, false otherwise
    */
   @Override
-  public boolean onCameraTexture(int texIn, int texOut, int width, int height, long timeStamp) {
+  public boolean onCameraTexture(int texIn, int texOut, int width, int height,
+      long timeStamp) {
     // as soon as we hit 30 frames, let's calculate frames/second
     mFrameCounter++;
     if (mFrameCounter >= 30) {
-      final int fps = (int) (mFrameCounter * 1e9 / (System.nanoTime() - mLastNanoTime));
+      final int fps = (int) (mFrameCounter * 1e9 / (System.nanoTime()
+          - mLastNanoTime));
 
       /* If mFpsText is null, grab the instance from the layout.
        * Otherwise, add the fpsUpdater to the Main looper's runnable queue (all UI must be done
@@ -118,16 +124,19 @@ public class CameraView extends BetterCameraGLSurfaceView implements
         new Handler(Looper.getMainLooper()).post(fpsUpdater);
       } else {
         Log.d(LOGTAG, "mFpsText == null");
-        mFpsText = (TextView) ((Activity) getContext()).findViewById(R.id.fps_text_view);
+        mFpsText = (TextView) ((Activity) getContext())
+            .findViewById(R.id.fps_text_view);
       }
       mFrameCounter = 0;
       mLastNanoTime = System.nanoTime();
     }
 
+    //todo: make a hsv slider/prefrences that are saved
     ImageProcessor.TargetsInfo dest = new ImageProcessor.TargetsInfo();
     // finally, process the image! This calls our native C++ code
     ImageProcessor
-        .processImage(texIn, texOut, width, height, procMode, 45, 60, 89, 255, 100, 255, dest);
+        .processImage(texIn, texOut, width, height, procMode, 45, 60, 89, 255,
+            100, 255, dest);
 
     VisionReport report = new VisionReport();
 

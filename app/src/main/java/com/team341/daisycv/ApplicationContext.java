@@ -4,9 +4,11 @@ import android.app.Application;
 import android.content.Context;
 
 /**
- * Created by joshs on 8/5/2017.
+ * Allows objects without access to the application context to access it.
+ *
+ * @author Joshua Sizer
+ * @since 7/31/17
  */
-
 public class ApplicationContext extends Application {
 
   private static Context context;

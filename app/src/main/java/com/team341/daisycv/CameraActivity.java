@@ -10,15 +10,18 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 /**
- * Created by joshs on 7/23/2017.
+ * The activity that is launched when camera permissions are granted. This is
+ * the main activity of the program, where the CameraView is manipulated and
+ * the GUI is modified.
+ *
+ * @author Joshua Sizer
+ * @since 7/23/2017.
  */
-
 public class CameraActivity extends Activity {
 
   public static final String LOGTAG = "CameraActivity";
@@ -51,7 +54,6 @@ public class CameraActivity extends Activity {
 
   @Override
   protected void onPause() {
-    Log.i(LOGTAG, "onPause()");
     super.onPause();
     mCameraView.onPause();
 

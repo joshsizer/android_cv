@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Daisy CV</string>
-    <string name="dialog_camera_permission_rationale"></string>
+    <string name="dialog_camera_permission_rationale">To function properly, Camera needs your permission. Go to settings to
+        allow permission for Camera"</string>
+    <string name="dialog_camera_permission_error_title">Camera error</string>
     <string name="settings">Settings</string>
     <string name="dismiss">Dismiss</string>
 </resources>
