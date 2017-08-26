@@ -18,11 +18,14 @@ import android.support.v4.content.ContextCompat;
  * are granted to this application. The state flow for granting permissions is |
  * ask -> accept -> camera activity | ask -> deny -> dismiss -> close | ask ->
  * deny -> settings -> user choice |
+ *
+ * @author Joshua Sizer
+ * @since 8/26/17
  */
 public class LauncherActivity extends Activity {
 
-  private static final int MY_PERMISSIONS_REQUEST_CAMERA = 0;
   private static final String TAG = "LauncherActivity";
+  private static final int MY_PERMISSIONS_REQUEST_CAMERA = 0;
 
   // the alert dialog which shows up if the user denies camera permissions
   private AlertDialog cameraErrorDialog;
