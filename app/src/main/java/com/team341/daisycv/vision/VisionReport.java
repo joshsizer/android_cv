@@ -9,6 +9,11 @@ import org.json.JSONObject;
 
 /**
  * This is the message that will be sent to the robot!
+ *
+ * Each field should send the relevant information to the robot, in whatever
+ * units are deemed necessary for robot function. Ideally, all values should
+ * need no more processing to be useful, since CPU time on the Roborio is
+ * precious.
  */
 public class VisionReport implements JsonSerializable {
 
