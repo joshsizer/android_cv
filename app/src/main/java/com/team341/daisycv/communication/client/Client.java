@@ -1,7 +1,6 @@
 package com.team341.daisycv.communication.client;
 
 import android.content.Intent;
-import android.support.annotation.RequiresPermission.Read;
 import android.util.Log;
 import com.team341.daisycv.ApplicationContext;
 import com.team341.daisycv.R;
@@ -75,7 +74,11 @@ public class Client {
    * have that lock if it is synchronized.
    */
   public void stop() {
-    mEnabled = false;
+    // make any thread trying to access this variable block while we modify
+    // its value. Also, block until all threads are done using this variable
+    synchronized (this) {
+      mEnabled = false;
+    }
 
     if (mConnectionThread != null && mConnectionThread.isAlive()) {
       try {
