@@ -3,6 +3,7 @@ package com.team341.daisycv.communication.client;
 import android.content.Intent;
 import android.util.Log;
 import com.team341.daisycv.ApplicationContext;
+import com.team341.daisycv.R;
 import com.team341.daisycv.communication.messages.JsonSerializable;
 import com.team341.daisycv.vision.VisionReport;
 import java.io.IOException;
@@ -12,18 +13,18 @@ import java.util.concurrent.ArrayBlockingQueue;
 /**
  * A client will connect to a server on the robot.
  *
- * The connection thread will monitor the connection status of the socket. The client is
- * connected to the server in the case that there is a heartbeat message being sent and
- * received by the client and server. If the time between when a heartbeat message is sent and
- * received exceeds a threshold, the socket will be closed and a new socket connection will be
- * made.
+ * The connection thread will monitor the connection status of the socket. The
+ * client is connected to the server in the case that there is a heartbeat
+ * message being sent and received by the client and server. If the time between
+ * when a heartbeat message is sent and received exceeds a threshold, the socket
+ * will be closed and a new socket connection will be made.
  *
- * The read thread will read from the socket's input stream and process any messages being sent
- * from the server. These may include requests to change vision mode, on field game state
- * updates, and heartbeat messages.
+ * The read thread will read from the socket's input stream and process any
+ * messages being sent from the server. These may include requests to change
+ * vision mode, on field game state updates, and heartbeat messages.
  *
- * The write thread will write any messages to the sockets output stream, including vision
- * messages and heartbeat messages.
+ * The write thread will write any messages to the sockets output stream,
+ * including vision messages and heartbeat messages.
  *
  * @author Joshua Sizer
  * @since 8/8/17
@@ -67,7 +68,9 @@ public class Client {
   public synchronized void stop() {
     Log.i(LOGTAG, "stop()");
 
-    mEnabled = false;
+    synchronized (this) {
+      mEnabled = false;
+    }
 
     try {
       if (mSocket != null) {
@@ -109,28 +112,26 @@ public class Client {
     Log.i(LOGTAG, "Joined Read thread");
   }
 
-  protected boolean isEnabled() {
+  synchronized protected boolean isEnabled() {
     return mEnabled;
   }
 
-  protected boolean isConnected() {
+  synchronized protected boolean isConnected() {
     return mConnected;
   }
 
   synchronized protected void notifyConnected() {
-    Log.d(LOGTAG, "notifyConnected()");
     mConnected = true;
     broadcastConnected();
   }
 
-  protected void notifyDisconnected() {
-    Log.d(LOGTAG, "notifyDisconnected()");
+  synchronized protected void notifyDisconnected() {
     mConnected = false;
     broadcastDisconnected();
   }
 
 
-  public void updateLastReceivedHeartbeatTime(long time) {
+  synchronized public void updateLastReceivedHeartbeatTime(long time) {
     mConnectionThread.updateLastReceivedHeartbeatTime(time);
   }
 
@@ -145,7 +146,8 @@ public class Client {
         mSocket = new Socket(mHostname, mPort);
         mSocket.setSoTimeout(100);
         Log.i(LOGTAG,
-            "Connected to " + mSocket.getInetAddress() + ":" + mSocket.getPort());
+            "Connected to " + mSocket.getInetAddress() + ":" + mSocket
+                .getPort());
       }
     } catch (IOException e) {
       Log.e(LOGTAG, "Cannot connect to server!");
@@ -153,7 +155,7 @@ public class Client {
     }
   }
 
-  public void sendVisionReport(VisionReport report) {
+  synchronized public void sendVisionReport(VisionReport report) {
     getMessageQueue().offer(report);
   }
 
@@ -170,12 +172,14 @@ public class Client {
   }
 
   protected void broadcastConnected() {
-    Intent broadcastConnected = new Intent("com.team341.daisycv.ROBOT_CONNECTED");
+    Intent broadcastConnected = new Intent(ApplicationContext.get().getString
+        (R.string.robot_connected_intent_filter));
     ApplicationContext.get().sendBroadcast(broadcastConnected);
   }
 
   protected void broadcastDisconnected() {
-    Intent broadcastDisconnected = new Intent("com.team341.daisycv.ROBOT_DISCONNECTED");
+    Intent broadcastDisconnected = new Intent(ApplicationContext.get()
+        .getString(R.string.robot_disconnected_intent_filter));
     ApplicationContext.get().sendBroadcast(broadcastDisconnected);
   }
 }

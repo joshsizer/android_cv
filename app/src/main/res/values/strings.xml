@@ -1,8 +1,14 @@
 <resources>
-    <string name="app_name">Daisy CV</string>
-    <string name="dialog_camera_permission_rationale">To function properly, Camera needs your permission. Go to settings to
-        allow permission for Camera"</string>
-    <string name="dialog_camera_permission_error_title">Camera error</string>
-    <string name="settings">Settings</string>
-    <string name="dismiss">Dismiss</string>
+  <string name="app_name">Daisy CV</string>
+  <string name="dialog_camera_permission_rationale">To function properly, Camera needs your permission. Go to settings to
+      allow permission for Camera"</string>
+  <string name="dialog_camera_permission_error_title">Camera error</string>
+  <string name="settings">Settings</string>
+  <string name="dismiss">Dismiss</string>
+  <string name="robot_connected_intent_filter">com.team341.daisycv.ROBOT_CONNECTED</string>
+  <string name="robot_disconnected_intent_filter">com"
+      + ".team341.daisycv.ROBOT_DISCONNECTED</string>
+  <string name="connection_status_default">Disconnected</string>
+  <string name="connection_status_connected">Connected</string>
+
 </resources>

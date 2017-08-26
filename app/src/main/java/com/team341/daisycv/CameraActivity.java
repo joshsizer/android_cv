@@ -17,7 +17,8 @@ import android.widget.TextView;
 /**
  * The activity that is launched when camera permissions are granted. This is
  * the main activity of the program, where the CameraView is manipulated and
- * the GUI is modified.
+ * the GUI is modified. The CameraView houses the Client and the callback
+ * for when a frame is captured, ready to be modified.
  *
  * @author Joshua Sizer
  * @since 7/23/2017.
@@ -25,8 +26,8 @@ import android.widget.TextView;
 public class CameraActivity extends Activity {
 
   public static final String LOGTAG = "CameraActivity";
-  private CameraView mCameraView;
 
+  private CameraView mCameraView;
   private BroadcastReceiver robotConnectedReceiver;
   private BroadcastReceiver robotDisconnectedReceiver;
 
@@ -44,8 +45,6 @@ public class CameraActivity extends Activity {
 
     robotConnectedReceiver = new RobotConnectedBroadcastReceiver();
     robotDisconnectedReceiver = new RobotDisconnectedBroadcastReceiver();
-
-    //ClientTest clientTest = new ClientTest(8341);
 
     setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera_view);
@@ -65,7 +64,11 @@ public class CameraActivity extends Activity {
   protected void onResume() {
     super.onResume();
 
-    // there's a possibility the user removes permissions while the app is running in the background
+    /*
+     * There's a possibility the user removes permissions while the app is
+     * running in the background, so we'll launch the LauncherActivity in
+     * that case
+     */
     if (ContextCompat.checkSelfPermission(this, permission.CAMERA)
         != PackageManager.PERMISSION_GRANTED) {
       Intent startPermissionActivity = new Intent(this, LauncherActivity.class);
@@ -74,10 +77,10 @@ public class CameraActivity extends Activity {
       return;
     }
 
-    registerReceiver(robotConnectedReceiver,
-        new IntentFilter("com.team341.daisycv.ROBOT_CONNECTED"));
-    registerReceiver(robotDisconnectedReceiver, new IntentFilter("com"
-        + ".team341.daisycv.ROBOT_DISCONNECTED"));
+    registerReceiver(robotConnectedReceiver, new IntentFilter
+        (getApplicationContext().getString(R.string.robot_connected_intent_filter)));
+    registerReceiver(robotDisconnectedReceiver, new IntentFilter
+        (getApplicationContext().getString(R.string.robot_disconnected_intent_filter)));
 
     mCameraView.onResume();
   }
@@ -88,7 +91,7 @@ public class CameraActivity extends Activity {
     @Override
     public void onReceive(Context context, Intent intent) {
       TextView connectedText = (TextView) findViewById(R.id.connected_text_view);
-      connectedText.setText("Connected");
+      connectedText.setText(R.string.connection_status_connected);
     }
   }
 
@@ -97,7 +100,7 @@ public class CameraActivity extends Activity {
     @Override
     public void onReceive(Context context, Intent intent) {
       TextView connectedText = (TextView) findViewById(R.id.connected_text_view);
-      connectedText.setText("Disconnected");
+      connectedText.setText(R.string.connection_status_default);
     }
   }
 }
