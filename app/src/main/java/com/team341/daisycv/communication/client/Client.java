@@ -1,6 +1,7 @@
 package com.team341.daisycv.communication.client;
 
 import android.content.Intent;
+import android.support.annotation.RequiresPermission.Read;
 import android.util.Log;
 import com.team341.daisycv.ApplicationContext;
 import com.team341.daisycv.R;
@@ -33,7 +34,8 @@ public class Client {
 
   public static final String LOGTAG = "Client";
 
-  private ClientThread mWriteThread, mReadThread;
+  private WriteThread mWriteThread;
+  private ReadThread mReadThread;
   private ConnectionThread mConnectionThread;
   private ArrayBlockingQueue<JsonSerializable> mToSend;
   private Socket mSocket;

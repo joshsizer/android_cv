@@ -9,16 +9,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Handles reading from the socket's input stream. This will attempt to read from the socket,
- * regardless of connection status.
+ * Handles reading from the socket's input stream. This will attempt to read
+ * from the socket, regardless of connection status.
  */
-public class ReadThread extends ClientThread {
+public class ReadThread extends Thread {
 
   public static final String LOGTAG = "ReadThread";
+
+  private final Client mClient;
   private BufferedReader reader;
 
   public ReadThread(Client client) {
-    super(client);
+    mClient = client;
   }
 
   @Override

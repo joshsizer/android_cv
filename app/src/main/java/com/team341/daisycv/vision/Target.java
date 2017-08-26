@@ -4,8 +4,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A representation of a target. There are many ways to represent a target. A target will always
- * have some amount of properties and they should be sendable via JSON object model.
+ * A representation of a target. There are many ways to represent a target. A
+ * target will always have some amount of properties and they should be sendable
+ * via JSON object model.
  */
 public class Target {
 

@@ -8,14 +8,15 @@ import java.util.concurrent.TimeUnit;
  * Created by joshs on 8/6/2017.
  */
 
-public class ConnectionThread extends ClientThread {
+public class ConnectionThread extends Thread {
 
   public static final String LOGTAG = "ConnectionThread";
+  private Client mClient;
   private long mLastSentHearbeatTime = System.currentTimeMillis();
   private long mLastReceivedHearbeatTime = 0;
 
   public ConnectionThread(Client client) {
-    super(client);
+    mClient = client;
   }
 
   @Override

@@ -9,15 +9,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * Handles writing to the thread's output stream
  */
-public class WriteThread extends ClientThread {
+public class WriteThread extends Thread {
 
   public static final String LOGTAG = "WriteThread";
 
+  private final Client mClient;
+
   public WriteThread(Client client) {
-    super(client);
+    mClient = client;
   }
 
-  @Override
   public void run() {
     while (mClient.isEnabled()) {
       JsonSerializable message = null;
