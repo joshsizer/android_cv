@@ -23,18 +23,21 @@ import org.opencv.android.BetterCameraGLSurfaceView;
  * Settings as an input, and provides a relevant timestamp for when the capture
  * was started. This allows you to set the camera exposure, capture size, width,
  * ect. They also do the work of calculating the Camera's field of view.
+ *
+ * @author Joshua Sizer
+ * @since 8/26/17
  */
-
 public class CameraView extends BetterCameraGLSurfaceView implements
     BetterCameraGLSurfaceView.CameraTextureListener {
 
-  private static final int kHeight = 480;
-  private static final int kWidth = 640;
   private static final String LOGTAG = "CameraView";
-  private int procMode = ImageProcessor.DISP_MODE_TARGETS;
+  private static final int kWidth = 640;
+  private static final int kHeight = 480;
+
   private final Client client;
   private TextView mFpsText;
   private int mFrameCounter;
+  private int procMode = ImageProcessor.DISP_MODE_TARGETS;
   private long mLastNanoTime;
 
   public CameraView(Context context, AttributeSet attrs) {
@@ -54,6 +57,12 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     client = new Client("localhost", 8341);
   }
 
+  /**
+   * An interface for specifying camera settings, like the exposure value,
+   * image stabilization, auto focus, focus distance, ect.
+   *
+   * @return The camera settings to capture images with
+   */
   private static BetterCamera2Renderer.Settings getCameraSettings() {
     BetterCamera2Renderer.Settings settings = new BetterCamera2Renderer.Settings();
     settings.height = kHeight;
@@ -74,14 +83,14 @@ public class CameraView extends BetterCameraGLSurfaceView implements
   }
 
   /**
-   * A callback for when the CameraView starts to display images
+   * A callback for when the CameraView starts to display images.
    *
    * @param width -  the width of the frames that will be delivered
    * @param height - the height of the frames that will be delivered
    */
   @Override
   public void onCameraViewStarted(int width, int height) {
-
+    // nothing to do!
   }
 
   /**
@@ -89,7 +98,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
    */
   @Override
   public void onCameraViewStopped() {
-
+    // nothing to do!
   }
 
   /**
@@ -112,9 +121,11 @@ public class CameraView extends BetterCameraGLSurfaceView implements
       final int fps = (int) (mFrameCounter * 1e9 / (System.nanoTime()
           - mLastNanoTime));
 
-      /* If mFpsText is null, grab the instance from the layout.
+      /*
+       * If mFpsText is null, grab the instance from the layout.
        * Otherwise, add the fpsUpdater to the Main looper's runnable queue (all UI must be done
-       * on the UI thread, AKA the main thread */
+       * on the UI thread, AKA the main thread
+       */
       if (mFpsText != null) {
         Runnable fpsUpdater = new Runnable() {
           public void run() {
@@ -135,7 +146,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     ImageProcessor.TargetsInfo dest = new ImageProcessor.TargetsInfo();
     // finally, process the image! This calls our native C++ code
     ImageProcessor
-        .processImage(texIn, texOut, width, height, procMode, 45, 60, 89, 255,
+        .processImage(texIn, texOut, width, height, procMode, 40, 65, 30, 255,
             100, 255, dest);
 
     VisionReport report = new VisionReport();
@@ -155,12 +166,18 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     return true;
   }
 
+  /**
+   * Destroys the client threads when the app is out of focus.
+   */
   @Override
   public void onPause() {
     super.onPause();
     client.stop();
   }
 
+  /**
+   * Restarts the client threads when the app returns to focus
+   */
   @Override
   public void onResume() {
     super.onResume();

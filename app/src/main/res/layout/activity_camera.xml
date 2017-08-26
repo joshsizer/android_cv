@@ -11,8 +11,7 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:focusable="true"
-    android:focusableInTouchMode="true">
-  </com.team341.daisycv.CameraView>
+    android:focusableInTouchMode="true"></com.team341.daisycv.CameraView>
 
   <LinearLayout
     android:layout_width="match_parent"
@@ -24,13 +23,13 @@
       android:layout_height="wrap_content"
       android:paddingRight="50dp"
       android:text="FPS: "
-      android:textColor="@android:color/white"/>
+      android:textColor="@android:color/white" />
 
     <TextView
       android:id="@+id/connected_text_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/connection_status_default"
-      android:textColor="@android:color/white"/>
+      android:textColor="@android:color/white" />
   </LinearLayout>
 </android.widget.FrameLayout>
