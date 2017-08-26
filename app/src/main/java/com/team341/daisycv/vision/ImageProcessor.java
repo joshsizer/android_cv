@@ -45,7 +45,7 @@ public class ImageProcessor {
    */
   public static native void processImage(int texIn, int texOut, int width,
       int height, int procMode, int hMin, int hMax, int sMin, int sMax,
-      int vMin, int vMax, TargetsInfo dest);
+      int vMin, int vMax, TargetsInfo dest, boolean log);
 
   /**
    * Cannot change naming without also changing naming in the native code,

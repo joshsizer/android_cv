@@ -8,6 +8,7 @@ import com.team341.daisycv.R;
 import com.team341.daisycv.communication.messages.JsonSerializable;
 import com.team341.daisycv.vision.VisionReport;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -52,9 +53,7 @@ public class Client {
   /**
    * Starts off a connection to the server, which runs on the robot.
    */
-  synchronized public void start() {
-    Log.i(LOGTAG, "start()");
-
+  public void start() {
     mConnectionThread = new ConnectionThread(this);
     mWriteThread = new WriteThread(this);
     mReadThread = new ReadThread(this);
@@ -67,11 +66,39 @@ public class Client {
     mReadThread.start();
   }
 
-  public synchronized void stop() {
-    Log.i(LOGTAG, "stop()");
+  /**
+   * This method should not inherit this object's lock (ie, be synchronized)
+   * because any thread that needs to be joined in this method call may call
+   * a method on this Client's object that requires this objects lock, and
+   * therefore will be in a dead lock. The thread that we want to join after
+   * it dies will try to synchronize on (this), but this method will already
+   * have that lock if it is synchronized.
+   */
+  public void stop() {
+    mEnabled = false;
 
-    synchronized (this) {
-      mEnabled = false;
+    if (mConnectionThread != null && mConnectionThread.isAlive()) {
+      try {
+        mConnectionThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (mWriteThread != null && mWriteThread.isAlive()) {
+      try {
+        mWriteThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (mReadThread != null && mReadThread.isAlive()) {
+      try {
+        mReadThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
 
     try {
@@ -81,37 +108,9 @@ public class Client {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
     mSocket = null;
+
     notifyDisconnected();
-
-    if (mConnectionThread != null && mConnectionThread.isAlive()) {
-      try {
-        mConnectionThread.interrupt();
-        mConnectionThread.join();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-    Log.i(LOGTAG, "Joined Connection thread");
-
-    if (mWriteThread != null && mWriteThread.isAlive()) {
-      try {
-        mWriteThread.join();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-    Log.i(LOGTAG, "Joined Write thread");
-
-    if (mReadThread != null && mReadThread.isAlive()) {
-      try {
-        mReadThread.join();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-    Log.i(LOGTAG, "Joined Read thread");
   }
 
   synchronized protected boolean isEnabled() {
@@ -122,16 +121,19 @@ public class Client {
     return mConnected;
   }
 
-  synchronized protected void notifyConnected() {
-    mConnected = true;
+  protected void notifyConnected() {
+    synchronized (this) {
+      mConnected = true;
+    }
     broadcastConnected();
   }
 
-  synchronized protected void notifyDisconnected() {
-    mConnected = false;
+  protected void notifyDisconnected() {
+    synchronized (this) {
+      mConnected = false;
+    }
     broadcastDisconnected();
   }
-
 
   synchronized public void updateLastReceivedHeartbeatTime(long time) {
     mConnectionThread.updateLastReceivedHeartbeatTime(time);
@@ -141,15 +143,14 @@ public class Client {
    * Attempts to create a socket with the specified hostname and port.
    */
   synchronized protected void tryConnecting() {
-    Log.i(LOGTAG, "tryConnecting()");
     try {
       if (mSocket == null) {
         Log.i(LOGTAG, "Attempting to connect to " + mHostname + ":" + mPort);
-        mSocket = new Socket(mHostname, mPort);
-        mSocket.setSoTimeout(100);
-        Log.i(LOGTAG,
-            "Connected to " + mSocket.getInetAddress() + ":" + mSocket
-                .getPort());
+        mSocket = new Socket();
+        // a heartbeat message should be sent and recieved every 100ms
+        mSocket.setSoTimeout(250);
+        mSocket.connect(new InetSocketAddress(mHostname, mPort));
+        Log.i(LOGTAG, "Successfully connected");
       }
     } catch (IOException e) {
       Log.e(LOGTAG, "Cannot connect to server!");

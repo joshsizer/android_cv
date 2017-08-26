@@ -26,9 +26,11 @@ struct TargetInfo {
 
 std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
                                     int h_min, int h_max, int s_min, int s_max,
-                                    int v_min, int v_max) {
-  LOGD("Image is %d x %d", w, h);
-  LOGD("H %d-%d S %d-%d V %d-%d", h_min, h_max, s_min, s_max, v_min, v_max);
+                                    int v_min, int v_max, bool log_stuff) {
+  if (log_stuff) {
+    LOGD("Image is %d x %d", w, h);
+    LOGD("H %d-%d S %d-%d V %d-%d", h_min, h_max, s_min, s_max, v_min, v_max);
+  }
   int64_t t;
 
   static cv::Mat input;
@@ -37,20 +39,26 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
   // read
   t = getTimeMs();
   glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, input.data);
-  LOGD("glReadPixels() costs %d ms", getTimeInterval(t));
+  if (log_stuff) {
+    LOGD("glReadPixels() costs %d ms", getTimeInterval(t));
+  }
 
   // modify
   t = getTimeMs();
   static cv::Mat hsv;
   cv::cvtColor(input, hsv, CV_RGBA2RGB);
   cv::cvtColor(hsv, hsv, CV_RGB2HSV);
-  LOGD("cvtColor() costs %d ms", getTimeInterval(t));
+  if (log_stuff) {
+    LOGD("cvtColor() costs %d ms", getTimeInterval(t));
+  }
 
   t = getTimeMs();
   static cv::Mat thresh;
   cv::inRange(hsv, cv::Scalar(h_min, s_min, v_min),
               cv::Scalar(h_max, s_max, v_max), thresh);
-  LOGD("inRange() costs %d ms", getTimeInterval(t));
+  if (log_stuff) {
+    LOGD("inRange() costs %d ms", getTimeInterval(t));
+  }
 
   t = getTimeMs();
   static cv::Mat contour_input;
@@ -102,7 +110,9 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
       if (target.width < kMinTargetWidth || target.width > kMaxTargetWidth ||
           target.height < kMinTargetHeight ||
           target.height > kMaxTargetHeight) {
-        LOGD("Rejecting target due to size");
+        if (log_stuff) {
+          LOGD("Rejecting target due to size");
+        }
         rejected_targets.push_back(std::move(target));
         continue;
       }
@@ -132,7 +142,9 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
         }
       }
       if (num_nearly_horizontal_slope != 2 && num_nearly_vertical_slope != 2) {
-        LOGD("Rejecting target due to shape");
+        if (log_stuff) {
+          LOGD("Rejecting target due to shape");
+        }
         rejected_targets.push_back(std::move(target));
         continue;
       }
@@ -143,18 +155,24 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
       double poly_area = cv::contourArea(poly);
       double fullness = original_contour_area / poly_area;
       if (fullness < kMinFullness || fullness > kMaxFullness) {
-        LOGD("Rejected target due to fullness");
+        if (log_stuff) {
+          LOGD("Rejected target due to fullness");
+        }
         rejected_targets.push_back(std::move(target));
         continue;
       }
 
       // We found a target
-      LOGD("Found target at %.2lf, %.2lf...size %.2lf, %.2lf",
-           target.centroid_x, target.centroid_y, target.width, target.height);
+      if (log_stuff) {
+        LOGD("Found target at %.2lf, %.2lf...size %.2lf, %.2lf",
+             target.centroid_x, target.centroid_y, target.width, target.height);
+      }
       targets.push_back(std::move(target));
     }
   }
-  LOGD("Contour analysis costs %d ms", getTimeInterval(t));
+  if (log_stuff) {
+    LOGD("Contour analysis costs %d ms", getTimeInterval(t));
+  }
 
   // write back
   t = getTimeMs();
@@ -177,14 +195,18 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
       cv::polylines(vis, target.points, true, cv::Scalar(255, 0, 0), 3);
     }
   }
-  LOGD("Creating vis costs %d ms", getTimeInterval(t));
+  if (log_stuff) {
+    LOGD("Creating vis costs %d ms", getTimeInterval(t));
+  }
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texOut);
   t = getTimeMs();
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE,
                   vis.data);
-  LOGD("glTexSubImage2D() costs %d ms", getTimeInterval(t));
+  if (log_stuff) {
+    LOGD("glTexSubImage2D() costs %d ms", getTimeInterval(t));
+  }
 
   return targets;
 }
@@ -223,9 +245,9 @@ static void ensureJniRegistered(JNIEnv *env) {
 extern "C" void process(JNIEnv *env, int tex1, int tex2, int w, int h,
                         int mode, int h_min, int h_max, int s_min,
                         int s_max, int v_min, int v_max,
-                        jobject destTargetInfo) {
+                        jobject destTargetInfo, bool log_stuff) {
   auto targets = processImpl(w, h, tex2, static_cast<DisplayMode>(mode), h_min,
-                             h_max, s_min, s_max, v_min, v_max);
+                             h_max, s_min, s_max, v_min, v_max, log_stuff);
   int numTargets = targets.size();
   ensureJniRegistered(env);
   env->SetIntField(destTargetInfo, sNumTargetsField, numTargets);
@@ -259,7 +281,7 @@ Java_com_team341_daisycv_vision_ImageProcessor_processImage(
     jint s_max,
     jint v_min,
     jint v_max,
-    jobject destTargetInfo) {
+    jobject destTargetInfo, jboolean log_stuff) {
   process(env,
           tex1,
           tex2,
@@ -272,5 +294,5 @@ Java_com_team341_daisycv_vision_ImageProcessor_processImage(
           s_max,
           v_min,
           v_max,
-          destTargetInfo);
+          destTargetInfo, log_stuff);
 }

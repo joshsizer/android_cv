@@ -30,7 +30,6 @@ public class WriteThread extends Thread {
       if (message == null) {
         continue;
       }
-      Log.i(LOGTAG, "Sending message " + JsonSerializer.toJson(message));
       sendString(JsonSerializer.toJson(message) + "\n");
     }
   }

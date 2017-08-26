@@ -38,7 +38,6 @@ public class ReadThread extends Thread {
         String message;
         try {
           message = reader.readLine();
-          Log.i(LOGTAG, "Received message: " + message);
         } catch (IOException e) {
           e.printStackTrace();
           continue;

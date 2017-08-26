@@ -33,6 +33,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
   private static final String LOGTAG = "CameraView";
   private static final int kWidth = 640;
   private static final int kHeight = 480;
+  private static final boolean logNative = false; // log info in native c++ code
 
   private final Client client;
   private TextView mFpsText;
@@ -147,7 +148,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     // finally, process the image! This calls our native C++ code
     ImageProcessor
         .processImage(texIn, texOut, width, height, procMode, 40, 65, 30, 255,
-            100, 255, dest);
+            100, 255, dest, logNative);
 
     VisionReport report = new VisionReport();
 
