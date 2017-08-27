@@ -6,9 +6,15 @@
   <string name="settings">Settings</string>
   <string name="dismiss">Dismiss</string>
   <string name="robot_connected_intent_filter">com.team341.daisycv.ROBOT_CONNECTED</string>
-  <string name="robot_disconnected_intent_filter">com"
-      + ".team341.daisycv.ROBOT_DISCONNECTED</string>
+  <string name="robot_disconnected_intent_filter">com.team341.daisycv.ROBOT_DISCONNECTED</string>
   <string name="connection_status_default">Disconnected</string>
   <string name="connection_status_connected">Connected</string>
+
+  <string name="hue_min_key">hue_min_key</string>
+  <string name="hue_max_key">hue_max_key</string>
+  <string name="sat_min_key">sat_min_key</string>
+  <string name="sat_max_key">sat_max_key</string>
+  <string name="val_min_key">val_min_key</string>
+  <string name="val_max_key">val_max_key</string>
 
 </resources>

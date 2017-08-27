@@ -9,9 +9,12 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -28,8 +31,10 @@ public class CameraActivity extends Activity {
   public static final String LOGTAG = "CameraActivity";
 
   private CameraView mCameraView;
+  private Preferences mPreferences;
   private BroadcastReceiver robotConnectedReceiver;
   private BroadcastReceiver robotDisconnectedReceiver;
+  private BottomSheetBehavior mBottomSheetBehavior;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +48,32 @@ public class CameraActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
+    mPreferences = new Preferences(getApplicationContext());
+
     robotConnectedReceiver = new RobotConnectedBroadcastReceiver();
     robotDisconnectedReceiver = new RobotDisconnectedBroadcastReceiver();
 
     setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera_view);
     mCameraView.setCameraTextureListener(mCameraView);
+
+    View bottomSheet = findViewById(R.id.bottom_sheet1);
+    mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
+    mButton1 = (Button) findViewById(R.id.button_1);
+    mButton1.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        if(mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+          mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+          mButton1.setText(R.string.collapse_button1);
+        }
+        else {
+          mBottomSheetBehavior1.setState(BottomSheetBehavior.STATE_COLLAPSED);
+          mButton1.setText(R.string.button1);
+        }
+      }
+    });
   }
 
   @Override
