@@ -77,12 +77,12 @@ public class Preferences {
   public void setHSVSaturation(int min, int max) {
     setInt(mContext.getString(R.string.sat_min_key), min);
     setInt(mContext.getString(R.string.sat_max_key), max);
-    hue = new Pair<>(min, max);
+    sat = new Pair<>(min, max);
   }
 
   public void setHSVValue(int min, int max) {
     setInt(mContext.getString(R.string.val_min_key), min);
     setInt(mContext.getString(R.string.val_max_key), max);
-    hue = new Pair<>(min, max);
+    val = new Pair<>(min, max);
   }
 }

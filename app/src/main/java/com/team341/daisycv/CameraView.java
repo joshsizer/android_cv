@@ -38,8 +38,10 @@ public class CameraView extends BetterCameraGLSurfaceView implements
   private final Client client;
   private TextView mFpsText;
   private int mFrameCounter;
-  private int procMode = ImageProcessor.DISP_MODE_TARGETS;
+  private int procMode = ImageProcessor.DISP_MODE_THRESH;
   private long mLastNanoTime;
+
+  private int mHueMin, mHueMax, mSatMin, mSatMax, mValMin, mValMax;
 
   public CameraView(Context context, AttributeSet attrs) {
     super(context, attrs, getCameraSettings());
@@ -48,7 +50,7 @@ public class CameraView extends BetterCameraGLSurfaceView implements
       @Override
       public void onClick(View v) {
         if (procMode == ImageProcessor.DISP_MODE_RAW) {
-          procMode = ImageProcessor.DISP_MODE_TARGETS;
+          procMode = ImageProcessor.DISP_MODE_THRESH;
         } else {
           procMode = ImageProcessor.DISP_MODE_RAW;
         }
@@ -147,8 +149,9 @@ public class CameraView extends BetterCameraGLSurfaceView implements
     ImageProcessor.TargetsInfo dest = new ImageProcessor.TargetsInfo();
     // finally, process the image! This calls our native C++ code
     ImageProcessor
-        .processImage(texIn, texOut, width, height, procMode, 40, 65, 30, 255,
-            100, 255, dest, logNative);
+        .processImage(texIn, texOut, width, height, procMode,
+            mHueMin, mHueMax, mSatMin, mSatMax,
+            mValMin, mValMax, dest, logNative);
 
     VisionReport report = new VisionReport();
 
@@ -183,6 +186,16 @@ public class CameraView extends BetterCameraGLSurfaceView implements
   public void onResume() {
     super.onResume();
     client.start();
+  }
+
+  public void setHSV(int hueMin, int hueMax, int satMin, int satMax, int
+      valMin, int valMax) {
+    mHueMin = hueMin;
+    mHueMax = hueMax;
+    mSatMin = satMin;
+    mSatMax = satMax;
+    mValMin = valMin;
+    mValMax = valMax;
   }
 
   public void setProcessingMode(int mode) {

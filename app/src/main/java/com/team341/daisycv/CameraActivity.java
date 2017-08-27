@@ -9,13 +9,15 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.support.v4.content.ContextCompat;
-import android.view.View;
+import android.util.Log;
+import android.util.Pair;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
+import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
+import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarFinalValueListener;
+import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
 
 /**
  * The activity that is launched when camera permissions are granted. This is
@@ -34,7 +36,6 @@ public class CameraActivity extends Activity {
   private Preferences mPreferences;
   private BroadcastReceiver robotConnectedReceiver;
   private BroadcastReceiver robotDisconnectedReceiver;
-  private BottomSheetBehavior mBottomSheetBehavior;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -57,23 +58,17 @@ public class CameraActivity extends Activity {
     mCameraView = (CameraView) findViewById(R.id.camera_view);
     mCameraView.setCameraTextureListener(mCameraView);
 
-    View bottomSheet = findViewById(R.id.bottom_sheet1);
-    mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+     setUpRangeSeekBar("hue", R.id.hueRangeSeekBar,
+        R.id.hueMinTextView,
+        R.id.hueMaxTextView);
+    setUpRangeSeekBar("saturation", R.id.satRangeSeekBar,
+        R.id.satMinTextView,
+        R.id.satMaxTextView);
+    setUpRangeSeekBar("value", R.id.valRangeSeekBar,
+        R.id.valMinTextView,
+        R.id.valMaxTextView);
 
-    mButton1 = (Button) findViewById(R.id.button_1);
-    mButton1.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if(mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-          mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-          mButton1.setText(R.string.collapse_button1);
-        }
-        else {
-          mBottomSheetBehavior1.setState(BottomSheetBehavior.STATE_COLLAPSED);
-          mButton1.setText(R.string.button1);
-        }
-      }
-    });
+    updateCameraViewHSV();
   }
 
   @Override
@@ -127,6 +122,93 @@ public class CameraActivity extends Activity {
       TextView connectedText = (TextView) findViewById(R.id.connected_text_view);
       connectedText.setText(R.string.connection_status_default);
     }
+  }
+
+  private CrystalRangeSeekbar setUpRangeSeekBar(final String name, int
+      seekBarId, int
+      minTextId, int maxTextId) {
+    // get seekbar from view
+    final CrystalRangeSeekbar rangeSeekbar = (CrystalRangeSeekbar)
+        findViewById(seekBarId);
+
+    // get min and max text view
+    final TextView tvMin = (TextView) findViewById(minTextId);
+    final TextView tvMax = (TextView) findViewById(maxTextId);
+
+    Pair<Integer, Integer> startingValues = null;
+
+    if ("hue".equals(name)) {
+      startingValues = mPreferences.getHSVHue();
+      rangeSeekbar.setMinStartValue(startingValues.first);
+      rangeSeekbar.setMaxStartValue(startingValues.second);
+      rangeSeekbar.apply();
+
+      // set listener
+      rangeSeekbar.setOnRangeSeekbarChangeListener(
+          new OnRangeSeekbarChangeListener() {
+            @Override
+            public void valueChanged(Number minValue, Number maxValue) {
+              tvMin.setText(String.valueOf(minValue));
+              tvMax.setText(String.valueOf(maxValue));
+              Log.i("CameraActivity", "Setting hue");
+              mPreferences.setHSVHue(minValue.intValue(), maxValue.intValue());
+              updateCameraViewHSV();
+            }
+          });
+    } else if ("saturation".equals(name)) {
+      startingValues = mPreferences.getHSVSaturation();
+      rangeSeekbar.setMinStartValue(startingValues.first);
+      rangeSeekbar.setMaxStartValue(startingValues.second);
+      rangeSeekbar.apply();
+
+      rangeSeekbar.setOnRangeSeekbarChangeListener(
+          new OnRangeSeekbarChangeListener() {
+            @Override
+            public void valueChanged(Number minValue, Number maxValue) {
+              tvMin.setText(String.valueOf(minValue));
+              tvMax.setText(String.valueOf(maxValue));
+              Log.i("CameraActivity", "Setting saturation");
+              mPreferences.setHSVSaturation(minValue.intValue(), maxValue
+                  .intValue());
+              updateCameraViewHSV();
+            }
+          });
+    } else if ("value".equals(name)) {
+      startingValues = mPreferences.getHSVValue();
+      rangeSeekbar.setMinStartValue(startingValues.first);
+      rangeSeekbar.setMaxStartValue(startingValues.second);
+      rangeSeekbar.apply();
+
+      rangeSeekbar.setOnRangeSeekbarChangeListener(
+          new OnRangeSeekbarChangeListener() {
+            @Override
+            public void valueChanged(Number minValue, Number maxValue) {
+              tvMin.setText(String.valueOf(minValue));
+              tvMax.setText(String.valueOf(maxValue));
+              Log.i("CameraActivity", "Setting Value");
+              mPreferences.setHSVValue(minValue.intValue(), maxValue.intValue());
+              updateCameraViewHSV();
+            }
+          });
+    }
+
+    return rangeSeekbar;
+  }
+
+  private void updateCameraViewHSV() {
+    Pair<Integer, Integer> hue = mPreferences.getHSVHue();
+    Pair<Integer, Integer> sat = mPreferences.getHSVSaturation();
+    Pair<Integer, Integer> val = mPreferences.getHSVValue();
+
+    if (mCameraView != null) {
+      mCameraView.setHSV(hue.first, hue.second, sat.first, sat.second, val
+          .first, val.second);
+    }
+
+    Log.d("CameraActivity", "hue: " + hue.first + " | " + hue.second);
+    Log.d("CameraActivity", "sat: " + sat.first + " | " + sat.second);
+    Log.d("CameraActivity", "val: " + val.first + " | " + val.second);
+
   }
 }
 

@@ -43,6 +43,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':openCVLibrary320')
     compile 'com.android.support:support-v4:26.0.0-alpha1'
-    compile 'org.florescu.android.rangeseekbar:rangeseekbar-library:0.3.0'
+    compile 'com.crystal:crystalrangeseekbar:1.1.1'
 }
 

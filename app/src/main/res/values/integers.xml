@@ -2,7 +2,7 @@
 <resources>
   <integer name="hue_min_default">45</integer>
   <integer name="hue_max_default">60</integer>
-  <integer name="sat_min_default">50</integer>
+  <integer name="sat_min_default">20</integer>
   <integer name="sat_max_default">255</integer>
   <integer name="val_min_default">50</integer>
   <integer name="val_max_default">255</integer>
