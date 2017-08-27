@@ -204,11 +204,6 @@ public class CameraActivity extends Activity {
       mCameraView.setHSV(hue.first, hue.second, sat.first, sat.second, val
           .first, val.second);
     }
-
-    Log.d("CameraActivity", "hue: " + hue.first + " | " + hue.second);
-    Log.d("CameraActivity", "sat: " + sat.first + " | " + sat.second);
-    Log.d("CameraActivity", "val: " + val.first + " | " + val.second);
-
   }
 }
 
