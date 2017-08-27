@@ -21,6 +21,10 @@ public class ConnectionThread extends Thread {
   private long mLastSentHearbeatTime = System.currentTimeMillis();
   private long mLastReceivedHearbeatTime = 0;
 
+  private static final long heartBeatPeriod = 100; //ms
+  private static final long maxHeartBeatResponse = 500; //ms
+  private static final long threadSleepTime = 100; //ms
+
   public ConnectionThread(Client client) {
     mClient = client;
   }
@@ -37,7 +41,7 @@ public class ConnectionThread extends Thread {
 
         long now = System.currentTimeMillis();
 
-        if ((now - mLastSentHearbeatTime) > 100) {
+        if ((now - mLastSentHearbeatTime) > heartBeatPeriod) {
           mClient.getMessageQueue()
               .offer(HeartbeatMessage.getInstance(), 100, TimeUnit.MILLISECONDS);
           mLastSentHearbeatTime = now;
@@ -47,17 +51,19 @@ public class ConnectionThread extends Thread {
         //Log.i(LOGTAG, "l received - sent hb time: " + (mLastReceivedHearbeatTime -
         //    mLastSentHearbeatTime));
 
-        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) > 800 && mClient
+        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) > maxHeartBeatResponse
+            && mClient
             .isConnected()) {
           mClient.notifyDisconnected();
         }
 
-        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) < 800 && !mClient
+        if (Math.abs(mLastReceivedHearbeatTime - mLastSentHearbeatTime) < maxHeartBeatResponse
+            && !mClient
             .isConnected()) {
           mClient.notifyConnected();
         }
 
-        Thread.sleep(100);
+        Thread.sleep(threadSleepTime);
 
       } catch (InterruptedException e) {
         e.printStackTrace();

@@ -17,7 +17,7 @@ public class ReadThread extends Thread {
   public static final String LOGTAG = "ReadThread";
 
   private final Client mClient;
-  private BufferedReader reader;
+  private static final long threadSleepTime = 100;
 
   public ReadThread(Client client) {
     mClient = client;
@@ -56,7 +56,7 @@ public class ReadThread extends Thread {
         }
       } else {
         try {
-          Thread.sleep(100, 0);
+          Thread.sleep(threadSleepTime, 0);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
