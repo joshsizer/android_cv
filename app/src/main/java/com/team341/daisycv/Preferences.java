@@ -3,6 +3,7 @@ package com.team341.daisycv;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.Pair;
 
 /**
@@ -28,7 +29,8 @@ public class Preferences {
 
   public void setInt(String key, int value) {
     mPreferences.edit().putInt(key, value);
-    mPreferences.edit().commit();
+    boolean success = mPreferences.edit().commit();
+    Log.d("Preferences", "" + success);
   }
 
   public int getInt(String value, int defaultValue) {
