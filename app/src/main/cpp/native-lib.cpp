@@ -27,10 +27,8 @@ struct TargetInfo {
 std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
                                     int h_min, int h_max, int s_min, int s_max,
                                     int v_min, int v_max, bool log_stuff) {
-  if (log_stuff) {
-    LOGD("Image is %d x %d", w, h);
-    LOGD("H %d-%d S %d-%d V %d-%d", h_min, h_max, s_min, s_max, v_min, v_max);
-  }
+  LOGD("Image is %d x %d", w, h);
+  LOGD("H %d-%d S %d-%d V %d-%d", h_min, h_max, s_min, s_max, v_min, v_max);
   int64_t t;
 
   static cv::Mat input;
@@ -39,26 +37,20 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
   // read
   t = getTimeMs();
   glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, input.data);
-  if (log_stuff) {
-    LOGD("glReadPixels() costs %d ms", getTimeInterval(t));
-  }
+  LOGD("glReadPixels() costs %d ms", getTimeInterval(t));
 
   // modify
   t = getTimeMs();
   static cv::Mat hsv;
   cv::cvtColor(input, hsv, CV_RGBA2RGB);
   cv::cvtColor(hsv, hsv, CV_RGB2HSV);
-  if (log_stuff) {
-    LOGD("cvtColor() costs %d ms", getTimeInterval(t));
-  }
+  LOGD("cvtColor() costs %d ms", getTimeInterval(t));
 
   t = getTimeMs();
   static cv::Mat thresh;
   cv::inRange(hsv, cv::Scalar(h_min, s_min, v_min),
               cv::Scalar(h_max, s_max, v_max), thresh);
-  if (log_stuff) {
-    LOGD("inRange() costs %d ms", getTimeInterval(t));
-  }
+  LOGD("inRange() costs %d ms", getTimeInterval(t));
 
   t = getTimeMs();
   static cv::Mat contour_input;
@@ -110,9 +102,7 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
       if (target.width < kMinTargetWidth || target.width > kMaxTargetWidth ||
           target.height < kMinTargetHeight ||
           target.height > kMaxTargetHeight) {
-        if (log_stuff) {
-          LOGD("Rejecting target due to size");
-        }
+        LOGD("Rejecting target due to size");
         rejected_targets.push_back(std::move(target));
         continue;
       }
@@ -142,9 +132,7 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
         }
       }
       if (num_nearly_horizontal_slope != 2 && num_nearly_vertical_slope != 2) {
-        if (log_stuff) {
-          LOGD("Rejecting target due to shape");
-        }
+        LOGD("Rejecting target due to shape");
         rejected_targets.push_back(std::move(target));
         continue;
       }
@@ -155,24 +143,18 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
       double poly_area = cv::contourArea(poly);
       double fullness = original_contour_area / poly_area;
       if (fullness < kMinFullness || fullness > kMaxFullness) {
-        if (log_stuff) {
-          LOGD("Rejected target due to fullness");
-        }
+        LOGD("Rejected target due to fullness");
         rejected_targets.push_back(std::move(target));
         continue;
       }
 
       // We found a target
-      if (log_stuff) {
-        LOGD("Found target at %.2lf, %.2lf...size %.2lf, %.2lf",
-             target.centroid_x, target.centroid_y, target.width, target.height);
-      }
+      LOGD("Found target at %.2lf, %.2lf...size %.2lf, %.2lf",
+           target.centroid_x, target.centroid_y, target.width, target.height);
       targets.push_back(std::move(target));
     }
   }
-  if (log_stuff) {
-    LOGD("Contour analysis costs %d ms", getTimeInterval(t));
-  }
+  LOGD("Contour analysis costs %d ms", getTimeInterval(t));
 
   // write back
   t = getTimeMs();
@@ -195,18 +177,14 @@ std::vector<TargetInfo> processImpl(int w, int h, int texOut, DisplayMode mode,
       cv::polylines(vis, target.points, true, cv::Scalar(255, 0, 0), 3);
     }
   }
-  if (log_stuff) {
-    LOGD("Creating vis costs %d ms", getTimeInterval(t));
-  }
+  LOGD("Creating vis costs %d ms", getTimeInterval(t));
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texOut);
   t = getTimeMs();
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE,
                   vis.data);
-  if (log_stuff) {
-    LOGD("glTexSubImage2D() costs %d ms", getTimeInterval(t));
-  }
+  LOGD("glTexSubImage2D() costs %d ms", getTimeInterval(t));
 
   return targets;
 }

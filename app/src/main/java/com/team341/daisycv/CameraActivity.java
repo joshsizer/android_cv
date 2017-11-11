@@ -58,7 +58,9 @@ public class CameraActivity extends Activity {
     mCameraView = (CameraView) findViewById(R.id.camera_view);
     mCameraView.setCameraTextureListener(mCameraView);
 
-     setUpRangeSeekBar("hue", R.id.hueRangeSeekBar,
+    /*
+    This is for dynamic changing of HSV
+    setUpRangeSeekBar("hue", R.id.hueRangeSeekBar,
         R.id.hueMinTextView,
         R.id.hueMaxTextView);
     setUpRangeSeekBar("saturation", R.id.satRangeSeekBar,
@@ -69,6 +71,7 @@ public class CameraActivity extends Activity {
         R.id.valMaxTextView);
 
     updateCameraViewHSV();
+    */
   }
 
   @Override

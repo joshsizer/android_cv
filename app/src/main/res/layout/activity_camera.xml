@@ -34,10 +34,12 @@
       android:textColor="@android:color/white" />
   </LinearLayout>
 
+  <!--
   <fragment android:name="com.team341.daisycv.HSVFragment"
     android:id="@+id/article_fragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|center"/>
+    -->
 
 </android.widget.FrameLayout>
